@@ -35,16 +35,18 @@ pad i = replicate i ' '
 
 {- Funciones pedidas. -}
 
---foldA23::
-foldA23 = undefined
+foldA23:: (a->c)->(b->c->c->c)->(b->b->c->c->c->c) -> Arbol23 a b -> c
+foldA23 f g h (Hoja x) = f x
+foldA23 f g h (Dos x t1 t2) = g x (foldA23 f g h t1) (foldA23 f g h t2)
+foldA23 f g h (Tres x y t1 t2 t3) = h x y (foldA23 f g h t1) (foldA23 f g h t2) (foldA23 f g h t3)
 
 --Lista en preorden de los internos del árbol.
 internos::Arbol23 a b->[b]
-internos = undefined
+internos = foldA23 (const []) (\x r1 r2 -> (x:r1)++r2) (\x y r1 r2 r3 -> (x:y:r1)++r2++r3)
 
 --Lista las hojas de izquierda a derecha.
 hojas::Arbol23 a b->[a]
-hojas = undefined
+hojas = foldA23 (:[]) (\x r1 r2 -> r1++r2) (\x y r1 r2 r3 -> r1++r2++r3)
 
 esHoja::Arbol23 a b->Bool
 esHoja = undefined
