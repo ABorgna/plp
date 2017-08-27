@@ -64,7 +64,12 @@ incrementarHojas = mapA23 (+1) id
 --Trunca el árbol hasta un determinado nivel. Cuando llega a 0, reemplaza el resto del árbol por una hoja con el valor indicado.
 --Funciona para árboles infinitos.
 truncar::a->Integer->Arbol23 a b->Arbol23 a b
-truncar = (\h n t -> (foldA23 (\x -> (\h i -> if i == 0 then Hoja h else Hoja x)) (\x r1 r2 -> (\h i -> if i == 0 then Hoja h else Dos x (r1 h (i-1)) (r2 h (i-1)))) (\x y r1 r2 r3 -> (\h i -> if i == 0 then Hoja h else Tres x y (r1 h (i-1)) (r2 h (i-1)) (r3 h (i-1)))) t) h n)
+truncar = f
+
+ where f h n t = (foldA23 fnHoja fnDos fnTres t) h n
+       fnHoja = \x -> (\h i -> if i == 0 then Hoja h else Hoja x)
+       fnDos = \x r1 r2 -> (\h i -> if i == 0 then Hoja h else Dos x (r1 h (i-1)) (r2 h (i-1)) )
+       fnTres = \x y r1 r2 r3 -> (\h i -> if i == 0 then Hoja h else Tres x y (r1 h (i-1)) (r2 h (i-1)) (r3 h (i-1)) )
 
 --Evalúa las funciones tomando los valores de los hijos como argumentos.
 --En el caso de que haya 3 hijos, asocia a izquierda.
