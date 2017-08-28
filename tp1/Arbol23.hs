@@ -74,7 +74,8 @@ truncar = f
 --Evalúa las funciones tomando los valores de los hijos como argumentos.
 --En el caso de que haya 3 hijos, asocia a izquierda.
 evaluar::Arbol23 a (a->a->a)->a
-evaluar = undefined
+
+evaluar = foldA23 (id) (\f t1 t2 -> f t1 t2) (\f g t1 t2 t3 -> g (f t1 t2) t3)
 
 --Ejemplo:
 --evaluar (truncar 0 6 arbolito3) = 22 = (1*2-3)+(2*3-4)+(3*4-5)+(4*5-6)
