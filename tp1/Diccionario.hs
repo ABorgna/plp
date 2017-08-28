@@ -1,6 +1,6 @@
-module Diccionario (Diccionario, vacio, definir, definirVarias, obtener, claves) where
+-- Exportamos estructura para poder testear vacio
+module Diccionario (Diccionario(estructura), vacio, definir, definirVarias, obtener, claves) where
 
-import Data.Foldable
 import Data.Maybe
 import Data.List
 import Arbol23
