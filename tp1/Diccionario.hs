@@ -1,5 +1,6 @@
 module Diccionario (Diccionario, vacio, definir, definirVarias, obtener, claves) where
 
+import Data.Foldable
 import Data.Maybe
 import Data.List
 import Arbol23
@@ -71,7 +72,7 @@ insertarYPropagar c v comp a23 =
 
 --Se asume que la lista no tiene claves repetidas.
 definirVarias :: [(clave,valor)] -> Diccionario clave valor -> Diccionario clave valor
-definirVarias = (flip.foldr.uncurry) definir
+definirVarias = (flip . foldr . uncurry) definir
 
 {- Funciones a implementar. -}
 
@@ -85,7 +86,7 @@ obtener :: Eq clave => clave -> Diccionario clave valor -> Maybe valor
 obtener = undefined
 
 claves :: Diccionario clave valor -> [clave]
-claves = undefined
+claves = concat . fmap (map fst . hojas) . estructura
 
 {- Diccionarios de prueba: -}
 
