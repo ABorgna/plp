@@ -1,3 +1,4 @@
+
 -- Exportamos estructura para poder testear vacio
 module Diccionario (Diccionario(estructura), vacio, definir, definirVarias, obtener, claves) where
 
@@ -80,8 +81,15 @@ vacio :: Comp clave -> Diccionario clave valor
 vacio c = Dicc c Nothing
 
 definir :: clave -> valor -> Diccionario clave valor -> Diccionario clave valor
-definir = undefined
+definir k v dicc = Dicc comp nuevaEstr 
 
+  where comp = cmp dicc
+        nuevaEstr = if isNothing(estructura dicc)
+                    then Just (Hoja (k,v))
+                    else Just (insertar k v comp a23)
+        a23 = fromJust (estructura dicc)
+
+        
 obtener :: Eq clave => clave -> Diccionario clave valor -> Maybe valor
 obtener = undefined
 
@@ -93,7 +101,6 @@ claves = concat . fmap (map fst . hojas) . estructura
 dicc1 :: Diccionario Int String
 dicc1 = definirVarias [(0,"Hola"),(-10,"Chau"),(15,"Felicidades"),(2,"etc."),(9,"a")]
                       (vacio (<))
-
 dicc2 :: Diccionario String String
 dicc2 = definirVarias [("inicio","casa"),("auto","flores"),("calle","auto"),
                        ("casa","escalera"),("ropero","alfajor"),("escalera","ropero")]
