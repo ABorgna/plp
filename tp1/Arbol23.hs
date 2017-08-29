@@ -43,14 +43,13 @@ foldA23 f g h (Tres x y t1 t2 t3) = h x y (foldA23 f g h t1) (foldA23 f g h t2) 
 
 --Lista en preorden de los internos del árbol.
 internos :: Arbol23 a b -> [b]
---internos = foldA23 (const []) (\x r1 r2 -> x:r1++r2) (\x y r1 r2 r3 -> x:y:r1++r2++r3)
 internos arbol = foldA23 (const id)
                          (\x r1 r2 -> (x:) . r1 . r2)
                          (\x y r1 r2 r3 -> (x:) . (y:) . r1 . r2 . r3) arbol []
 
 --Lista las hojas de izquierda a derecha.
 hojas :: Arbol23 a b -> [a]
-hojas = foldA23 (:[]) (\x r1 r2 -> r1++r2) (\x y r1 r2 r3 -> r1++r2++r3)
+hojas a = foldA23 (:) (\x r1 r2 -> r1 . r2) (\x y r1 r2 r3 -> r1 . r2 . r3) a []
 
 esHoja :: Arbol23 a b -> Bool
 esHoja = foldA23 (const True) (\x r1 r2 -> False) (\x y r1 r2 r3 -> False)
