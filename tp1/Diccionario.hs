@@ -1,6 +1,7 @@
 -- Exportamos estructura para poder testear vacio
 module Diccionario (Diccionario(estructura), vacio, definir, definirVarias, obtener, claves) where
 
+import Data.Foldable (concat)
 import Data.Maybe
 import Data.List
 import Arbol23
@@ -92,7 +93,7 @@ obtener :: Eq clave => clave -> Diccionario clave valor -> Maybe valor
 obtener = undefined
 
 claves :: Diccionario clave valor -> [clave]
-claves = concat . fmap (map fst . hojas) . estructura
+claves = Data.Foldable.concat . fmap (map fst . hojas) . estructura
 
 {- Diccionarios de prueba: -}
 
