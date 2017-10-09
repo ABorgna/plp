@@ -1,6 +1,7 @@
 -- Exportamos estructura para poder testear vacio
 module Diccionario (Diccionario(estructura), vacio, definir, definirVarias, obtener, claves) where
 
+import Data.Foldable (concat)
 import Data.Maybe
 import Data.List
 import Arbol23
@@ -89,10 +90,16 @@ definir k v dicc = Dicc comp nuevaEstr
         a23 = fromJust (estructura dicc)
         
 obtener :: Eq clave => clave -> Diccionario clave valor -> Maybe valor
-obtener = undefined
+obtener k dicc = if claves dicc == [] then Nothing else foldA23 casoHoja casoDos casoTres a23
+  
+  where casoHoja = \h -> if k == fst(h) then Just (snd h) else Nothing
+        casoDos = \x t1 t2 -> if comp k x then t1 else t2
+        casoTres = \x y t1 t2 t3 -> if comp k x then t1 else (if comp k y then t2 else t3)
+        comp = cmp dicc
+        a23 = fromJust (estructura dicc)
 
 claves :: Diccionario clave valor -> [clave]
-claves = concat . fmap (map fst . hojas) . estructura
+claves = Data.Foldable.concat . fmap (map fst . hojas) . estructura
 
 {- Diccionarios de prueba: -}
 
@@ -108,4 +115,3 @@ dicc2 = definirVarias [("inicio","casa"),("auto","flores"),("calle","auto"),
 dicc3 :: Diccionario Int String
 dicc3 = definirVarias [(0,"Hola"),(-10,"Chau"),(15,"Felicidades"),(2,"etc."),(9,"a")]
                       (vacio (\x y->x `mod` 5 < y `mod` 5))
-
