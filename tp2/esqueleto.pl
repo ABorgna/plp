@@ -54,4 +54,32 @@ completarConAgua(Tablero) :- maplist(maplist(instanciarCasillero), Tablero).
 
 test(1) :- matriz(M,2,3), adyacenteEnRango(M,2,2,2,3).
 test(2) :- matriz(M,2,3), setof((F,C), adyacenteEnRango(M,1,1,F,C), [ (1, 2), (2, 1), (2, 2)]).
-tests :- forall(between(1,2,N), test(N)). % Cambiar el 2 por la cantidad de tests que tengan.
+
+test(3) :- T = [[~, _, _],[o, _, _]], contenido(T,1,1,~), contenido(T,2,1,o).
+test(4) :- T = [[~, _, _],[o, _, _]], contenido(T,1,1,X), contenido(T,2,1,Y), X = ~, Y = o.
+test(5) :- T = [[o, ~],[o, ~]], setof((Y,X,C), contenido(T,Y,X,C), [(1,1,o), (1,2,~), (2,1,o), (2,2,~)]).
+
+test(6) :- T = [[o, _, _],[~, _, _]], disponible(T,2,3), not(disponible(T,1,2)).
+test(7) :- T = [[o, _, _],[~, _, _]], setof((Y,X), disponible(T,Y,X), [(1,3), (2,3)]).
+
+test(8) :- matriz(M,2,3), contenido(M,2,1,o), puedoColocar(2,vertical,M,1,3).
+test(9) :- matriz(M,2,3), setof((Dir,F,C), puedoColocar(3,Dir,M,F,C),
+                              [(horizontal,1,1), (horizontal,1,2), (horizontal,2,1), (horizontal,2,2)]).
+test(10) :- matriz(M,2,2), setof((Dir,F,C), puedoColocar(2,Dir,M,F,C),
+                              [(horizontal,1,1), (horizontal,2,1), (vertical,1,1), (vertical,1,2)]).
+
+test(11) :- matriz(M,3,2), setof(M, ubicarBarcos([2,1],M), [ [[o,o], [_,_], [o,_]], [[o,o], [_,_], [_,o]],
+                                                                 [[o,_], [_,_], [o,o]], [[_,o], [_,_], [o,o]] ]).
+
+test(12) :- matriz(M,3,2), completarConAgua(M), not(free(M,_,_)).
+test(13) :- T = [[o, _, _],[~, _, o]], completarConAgua(T), T = [[o, ~, ~],[~, ~, o]].
+
+test(14) :- T = [[o, _, _],[~, _, o]], golpear(T,2,3,R), R = [[o, _, _],[~, _, ~]].
+test(15) :- T = [[o, _, _],[~, _, o]], golpear(T,2,2,R), R = [[o, _, _],[~, ~, o]].
+
+test(16) :- T = [[o,o], [~,~], [~,o]], atacar(T,1,1,Res,R), Res = tocado, R = [[~,o], [~,~], [~,o]].
+test(17) :- T = [[o,o], [~,~], [~,o]], atacar(T,3,1,Res,R), Res = agua, R = T.
+test(18) :- T = [[o,o], [~,~], [~,o]], atacar(T,3,2,Res,R), Res = hundido, R = [[~,o], [~,~], [~,~]].
+
+tests :- forall(between(1,18,N), test(N)). % Cambiar el 2 por la cantidad de tests que tengan.
+
