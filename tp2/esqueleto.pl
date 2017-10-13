@@ -35,9 +35,7 @@ instanciarCasillero(X) :- nonvar(X).
 %contenido(+?Tablero, ?Fila, ?Columna, ?Contenido)
 
 %disponible(+Tablero, ?Fila, ?Columna)
-disponible(Tablero, Fila, Columna) :-
-    matriz(Tablero, M, N),
-    between(1, M, Fila), between(1, N, Columna), free(Tablero, Fila, Columna),
+disponible(Tablero, Fila, Columna) :- free(Tablero, Fila, Columna),
     forall(adyacenteEnRango(Tablero, Fila, Columna, F, C), free(Tablero, F, C)).
 
 %puedoColocar(+CantPiezas, ?Direccion, +Tablero, ?Fila, ?Columna)
