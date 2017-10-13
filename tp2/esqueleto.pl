@@ -21,17 +21,31 @@ enRango([Fila|Filas], F, C) :- F > 0, C > 0, length([Fila|Filas], FMax), F =< FM
 %adyacenteEnRango(+Tablero, +F1, +C1, ?F2, ?C2)
 adyacenteEnRango(T,F1,C1,F2,C2) :- adyacente(F1,C1,F2,C2), enRango(T,F2,C2).
 
+%------------------Predicados extra:------------------%
+
+%free(+Tablero, +Fila, +Columna)
+free(Tablero, Fila, Columna) :- nth1(Fila, Tablero, Row), nth1(Columna, Row, X), var(X).
+
+%instanciarCasillero(?X)
+instanciarCasillero(X) :- var(X), X = ~ .
+instanciarCasillero(X) :- nonvar(X).
+
 %------------------Predicados a definir:------------------%
 
 %contenido(+?Tablero, ?Fila, ?Columna, ?Contenido)
 
 %disponible(+Tablero, ?Fila, ?Columna)
+disponible(Tablero, Fila, Columna) :-
+    matriz(Tablero, M, N),
+    between(1, M, Fila), between(1, N, Columna), free(Tablero, Fila, Columna),
+    forall(adyacenteEnRango(Tablero, Fila, Columna, F, C), free(Tablero, F, C)).
 
 %puedoColocar(+CantPiezas, ?Direccion, +Tablero, ?Fila, ?Columna)
 
 %ubicarBarcos(+Barcos, +?Tablero)
 
 %completarConAgua(+?Tablero)
+completarConAgua(Tablero) :- maplist(maplist(instanciarCasillero), Tablero).
 
 %golpear(+Tablero, +NumFila, +NumColumna, -NuevoTab)
 
