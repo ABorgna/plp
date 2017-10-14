@@ -49,7 +49,7 @@ proximaPosicion(vertical, F1, C1, F2, C1) :- succ(F1, F2).
 
 ubicarUnBarco(Barco, Direccion, Tablero, Fila, Columna) :- M is Barco-1, proximaPosicion(Direccion, Fila, Columna, F, C),
 							   contenido(Tablero, Fila, Columna, o),
-							   ubicarBarco(M, Direccion, Tablero, F, C).
+							   ubicarUnBarco(M, Direccion, Tablero, F, C).
    
 ubicarBarcos([], _).     
 ubicarBarcos([Barco|Barcos], Tablero) :- puedoColocar(Barco, D, Tablero, F, C),
