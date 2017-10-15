@@ -33,7 +33,8 @@ instanciarCasillero(X) :- nonvar(X).
 %------------------Predicados a definir:------------------%
 
 %contenido(+?Tablero, ?Fila, ?Columna, ?Contenido)
-
+contenido(Tablero, Fila, Columna, Contenido) :- nth1(Fila, Tablero, Row), nth1(Columna, Row, X), X = Contenido.
+    
 %disponible(+Tablero, ?Fila, ?Columna)
 disponible(Tablero, Fila, Columna) :- free(Tablero, Fila, Columna),
     forall(adyacenteEnRango(Tablero, Fila, Columna, F, C), free(Tablero, F, C)).
@@ -53,6 +54,19 @@ proximaPosicion(vertical, F1, C1, F2, C1) :- succ(F1, F2).
 
 %ubicarBarcos(+Barcos, +?Tablero)
 
+%el chequeo de rango no hace falta porque puedoColocar es válido 
+proximaPosicion(horizontal, F1, C1, F1, C2) :- succ(C1, C2). 
+proximaPosicion(vertical, F1, C1, F2, C1) :- succ(F1, F2). 
+
+ubicarUnBarco(Barco, Direccion, Tablero, Fila, Columna) :- M is Barco-1, proximaPosicion(Direccion, Fila, Columna, F, C),
+							   contenido(Tablero, Fila, Columna, o),
+							   ubicarUnBarco(M, Direccion, Tablero, F, C).
+   
+ubicarBarcos([], _).     
+ubicarBarcos([Barco|Barcos], Tablero) :- puedoColocar(Barco, D, Tablero, F, C),
+					 ubicarUnBarco(Barco, D, Tablero, F, C),
+					 ubicarBarcos(Barcos, Tablero).
+							 
 %completarConAgua(+?Tablero)
 completarConAgua(Tablero) :- maplist(maplist(instanciarCasillero), Tablero).
 
