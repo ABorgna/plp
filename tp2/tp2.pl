@@ -51,12 +51,12 @@ disponible(Tablero, Fila, Columna) :- free(Tablero, Fila, Columna),
 
 %puedoColocar(+CantPiezas, ?Direccion, +Tablero, ?Fila, ?Columna)
 puedoColocar(1, _, Tablero, Fila, Columna) :- disponible(Tablero, Fila, Columna).
-puedoColocar(CantPiezas, Direccion, Tablero, Fila, Columna) :-  matriz(Tablero, X, Y), between(1,X,Fila), between(1,Y,Columna),
-                                                                CantPiezas > 1,
-                                                                CantPiezasPred is CantPiezas - 1,
-                                                                proximaPosicion(Direccion, Fila, Columna, ProximaFila, ProximaColumna),
-                                                                disponible(Tablero, Fila, Columna),
-                                                                puedoColocar(CantPiezasPred, Direccion, Tablero, ProximaFila , ProximaColumna).
+puedoColocar(CantPiezas, Direccion, Tablero, Fila, Columna) :- 
+    matriz(Tablero, X, Y), between(1,X,Fila), between(1,Y,Columna),
+    CantPiezas > 1, CantPiezasPred is CantPiezas - 1,
+    proximaPosicion(Direccion, Fila, Columna, ProximaFila, ProximaColumna),
+    disponible(Tablero, Fila, Columna),
+    puedoColocar(CantPiezasPred, Direccion, Tablero, ProximaFila , ProximaColumna).
 %puedoColocar(CantPiezas + 1, vertical, Tablero, Fila + 1, Columna) :- disponible(Tablero, Fila + 1, Columna), puedoColocar(CantPiezas, vertical, Tablero, Fila, Columna).
 
 %ubicarBarcos(+Barcos, +?Tablero)
