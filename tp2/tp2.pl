@@ -26,19 +26,24 @@ adyacenteEnRango(T,F1,C1,F2,C2) :- adyacente(F1,C1,F2,C2), enRango(T,F2,C2).
 %free(+Tablero, +Fila, +Columna)
 free(Tablero, Fila, Columna) :- nth1(Fila, Tablero, Row), nth1(Columna, Row, X), var(X).
 
+%proximaPosicion(?Direccion, +F1, +C1, -F2, -C2)
+proximaPosicion(horizontal, F1, C1, F1, C2) :- succ(C1, C2).
+proximaPosicion(vertical, F1, C1, F2, C1) :- succ(F1, F2).
+
+%ubicarUnBarco(+Barco, ?Direccion, +?Tablero, +Fila, +Columna)
+ubicarUnBarco(Barco, Direccion, Tablero, Fila, Columna) :- M is Barco-1, proximaPosicion(Direccion, Fila, Columna, F, C),
+                               contenido(Tablero, Fila, Columna, o),
+                               ubicarUnBarco(M, Direccion, Tablero, F, C).
+
 %instanciarCasillero(?X)
 instanciarCasillero(X) :- var(X), X = ~ .
 instanciarCasillero(X) :- nonvar(X).
-
-%proximaPosicion(?Direccion, +F1, +C1, -F2, -C2)
-proximaPosicion(horizontal, F1, C1, F1, C2) :- succ(C1, C2). 
-proximaPosicion(vertical, F1, C1, F2, C1) :- succ(F1, F2).
 
 %------------------Predicados a definir:------------------%
 
 %contenido(+?Tablero, ?Fila, ?Columna, ?Contenido)
 contenido(Tablero, Fila, Columna, Contenido) :- nth1(Fila, Tablero, Row), nth1(Columna, Row, X), X = Contenido.
-    
+
 %disponible(+Tablero, ?Fila, ?Columna)
 disponible(Tablero, Fila, Columna) :- free(Tablero, Fila, Columna),
     forall(adyacenteEnRango(Tablero, Fila, Columna, F, C), free(Tablero, F, C)).
@@ -46,28 +51,19 @@ disponible(Tablero, Fila, Columna) :- free(Tablero, Fila, Columna),
 %puedoColocar(+CantPiezas, ?Direccion, +Tablero, ?Fila, ?Columna)
 puedoColocar(1, _, Tablero, Fila, Columna) :- disponible(Tablero, Fila, Columna).
 puedoColocar(CantPiezas, Direccion, Tablero, Fila, Columna) :-  matriz(Tablero, X, Y), between(1,X,Fila), between(1,Y,Columna),
-																CantPiezas > 1,
-																CantPiezasPred is CantPiezas - 1,
-																proximaPosicion(Direccion, Fila, Columna, ProximaFila, ProximaColumna),
-																disponible(Tablero, Fila, Columna),
-																puedoColocar(CantPiezasPred, Direccion, Tablero, ProximaFila , ProximaColumna).
+                                                                CantPiezas > 1,
+                                                                CantPiezasPred is CantPiezas - 1,
+                                                                proximaPosicion(Direccion, Fila, Columna, ProximaFila, ProximaColumna),
+                                                                disponible(Tablero, Fila, Columna),
+                                                                puedoColocar(CantPiezasPred, Direccion, Tablero, ProximaFila , ProximaColumna).
 %puedoColocar(CantPiezas + 1, vertical, Tablero, Fila + 1, Columna) :- disponible(Tablero, Fila + 1, Columna), puedoColocar(CantPiezas, vertical, Tablero, Fila, Columna).
 
 %ubicarBarcos(+Barcos, +?Tablero)
-
-%el chequeo de rango no hace falta porque puedoColocar es válido 
-proximaPosicion(horizontal, F1, C1, F1, C2) :- succ(C1, C2). 
-proximaPosicion(vertical, F1, C1, F2, C1) :- succ(F1, F2). 
-
-ubicarUnBarco(Barco, Direccion, Tablero, Fila, Columna) :- M is Barco-1, proximaPosicion(Direccion, Fila, Columna, F, C),
-							   contenido(Tablero, Fila, Columna, o),
-							   ubicarUnBarco(M, Direccion, Tablero, F, C).
-   
-ubicarBarcos([], _).     
+ubicarBarcos([], _).
 ubicarBarcos([Barco|Barcos], Tablero) :- puedoColocar(Barco, D, Tablero, F, C),
-					 ubicarUnBarco(Barco, D, Tablero, F, C),
-					 ubicarBarcos(Barcos, Tablero).
-							 
+                     ubicarUnBarco(Barco, D, Tablero, F, C),
+                     ubicarBarcos(Barcos, Tablero).
+
 %completarConAgua(+?Tablero)
 completarConAgua(Tablero) :- maplist(maplist(instanciarCasillero), Tablero).
 
