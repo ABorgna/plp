@@ -43,7 +43,8 @@ instanciarCasillero(X) :- nonvar(X).
 %------------------Predicados a definir:------------------%
 
 %contenido(+?Tablero, ?Fila, ?Columna, ?Contenido)
-contenido(Tablero, Fila, Columna, Contenido) :- nth1(Fila, Tablero, Row), nth1(Columna, Row, X), X = Contenido.
+contenido(Tablero, Fila, Columna, Contenido) :-
+    nth1(Fila, Tablero, Row), nth1(Columna, Row, X), X = Contenido.
 
 %disponible(+Tablero, ?Fila, ?Columna)
 disponible(Tablero, Fila, Columna) :- free(Tablero, Fila, Columna),
@@ -52,12 +53,11 @@ disponible(Tablero, Fila, Columna) :- free(Tablero, Fila, Columna),
 %puedoColocar(+CantPiezas, ?Direccion, +Tablero, ?Fila, ?Columna)
 puedoColocar(1, _, Tablero, Fila, Columna) :- disponible(Tablero, Fila, Columna).
 puedoColocar(CantPiezas, Direccion, Tablero, Fila, Columna) :- 
-    matriz(Tablero, X, Y), between(1,X,Fila), between(1,Y,Columna),
+    contenido(Tablero, Fila, Columna, _),
     CantPiezas > 1, CantPiezasPred is CantPiezas - 1,
     proximaPosicion(Direccion, Fila, Columna, ProximaFila, ProximaColumna),
     disponible(Tablero, Fila, Columna),
     puedoColocar(CantPiezasPred, Direccion, Tablero, ProximaFila , ProximaColumna).
-%puedoColocar(CantPiezas + 1, vertical, Tablero, Fila + 1, Columna) :- disponible(Tablero, Fila + 1, Columna), puedoColocar(CantPiezas, vertical, Tablero, Fila, Columna).
 
 %ubicarBarcos(+Barcos, +?Tablero)
 ubicarBarcos([], _).
@@ -104,5 +104,5 @@ test(16) :- T = [[o,o], [~,~], [~,o]], atacar(T,1,1,Res,R), Res = tocado, R = [[
 test(17) :- T = [[o,o], [~,~], [~,o]], atacar(T,3,1,Res,R), Res = agua, R = T.
 test(18) :- T = [[o,o], [~,~], [~,o]], atacar(T,3,2,Res,R), Res = hundido, R = [[~,o], [~,~], [~,~]].
 
-tests :- forall(between(1,18,N), test(N)). % Cambiar el 2 por la cantidad de tests que tengan.
+tests :- forall(between(1,13,N), test(N)). % Cambiar el 2 por la cantidad de tests que tengan.
 
