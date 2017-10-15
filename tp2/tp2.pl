@@ -75,10 +75,12 @@ completarConAgua(Tablero) :- maplist(maplist(instanciarCasillero), Tablero).
 atacar(Tablero, Fila, Columna, agua, Tablero) :- golpear(Tablero, Fila, Columna, Tablero).
 
 atacar(Tablero, Fila, Columna, hundido, NuevoTab) :-
+    contenido(Tablero, Fila, Columna, o),
     golpear(Tablero, Fila, Columna, NuevoTab),
     forall(adyacenteEnRango(Tablero, Fila, Columna, F, C), not(contenido(Tablero, F, C, o))).
 
 atacar(Tablero, Fila, Columna, tocado, NuevoTab) :-
+    contenido(Tablero, Fila, Columna, o),
     golpear(Tablero, Fila, Columna, NuevoTab),
     adyacenteEnRango(Tablero, Fila, Columna, F, C),
     contenido(Tablero, F, C, o).
