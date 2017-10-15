@@ -24,7 +24,7 @@ adyacenteEnRango(T,F1,C1,F2,C2) :- adyacente(F1,C1,F2,C2), enRango(T,F2,C2).
 %------------------Predicados extra:------------------%
 
 %free(+Tablero, +Fila, +Columna)
-free(Tablero, Fila, Columna) :- nth1(Fila, Tablero, Row), nth1(Columna, Row, X), var(X).
+free(Tablero, Fila, Columna) :- contenido(Tablero, Fila, Columna, X), var(X).
 
 %proximaPosicion(?Direccion, +F1, +C1, -F2, -C2)
 proximaPosicion(horizontal, F1, C1, F1, C2) :- succ(C1, C2).
