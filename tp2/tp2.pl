@@ -71,8 +71,17 @@ completarConAgua(Tablero) :- maplist(maplist(instanciarCasillero), Tablero).
 %golpear(+Tablero, +NumFila, +NumColumna, -NuevoTab)
 
 % Completar instanciación soportada y justificar.
-%atacar(Tablero, Fila, Columna, Resultado, NuevoTab)
+%atacar(+Tablero, +Fila, +Columna, -Resultado, -NuevoTab)
+atacar(Tablero, Fila, Columna, agua, Tablero) :- golpear(Tablero, Fila, Columna, Tablero).
 
+atacar(Tablero, Fila, Columna, hundido, NuevoTab) :-
+    golpear(Tablero, Fila, Columna, NuevoTab),
+    forall(adyacenteEnRango(Tablero, Fila, Columna, F, C), not(contenido(Tablero, F, C, o))).
+
+atacar(Tablero, Fila, Columna, tocado, NuevoTab) :-
+    golpear(Tablero, Fila, Columna, NuevoTab),
+    adyacenteEnRango(Tablero, Fila, Columna, F, C),
+    contenido(Tablero, F, C, o).
 %------------------Tests:------------------%
 
 test(1) :- matriz(M,2,3), adyacenteEnRango(M,2,2,2,3).
