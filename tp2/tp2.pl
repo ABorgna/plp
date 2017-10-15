@@ -30,6 +30,10 @@ free(Tablero, Fila, Columna) :- nth1(Fila, Tablero, Row), nth1(Columna, Row, X),
 instanciarCasillero(X) :- var(X), X = ~ .
 instanciarCasillero(X) :- nonvar(X).
 
+%proximaPosicion(?Direccion, +F1, +C1, -F2, -C2)
+proximaPosicion(horizontal, F1, C1, F1, C2) :- succ(C1, C2). 
+proximaPosicion(vertical, F1, C1, F2, C1) :- succ(F1, F2).
+
 %------------------Predicados a definir:------------------%
 
 %contenido(+?Tablero, ?Fila, ?Columna, ?Contenido)
@@ -48,9 +52,6 @@ puedoColocar(CantPiezas, Direccion, Tablero, Fila, Columna) :-  matriz(Tablero, 
 																disponible(Tablero, Fila, Columna),
 																puedoColocar(CantPiezasPred, Direccion, Tablero, ProximaFila , ProximaColumna).
 %puedoColocar(CantPiezas + 1, vertical, Tablero, Fila + 1, Columna) :- disponible(Tablero, Fila + 1, Columna), puedoColocar(CantPiezas, vertical, Tablero, Fila, Columna).
-
-proximaPosicion(horizontal, F1, C1, F1, C2) :- succ(C1, C2). 
-proximaPosicion(vertical, F1, C1, F2, C1) :- succ(F1, F2).
 
 %ubicarBarcos(+Barcos, +?Tablero)
 
