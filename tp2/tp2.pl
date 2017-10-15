@@ -86,7 +86,7 @@ test(7) :- T = [[o, _, _],[~, _, _]], setof((Y,X), disponible(T,Y,X), [(1,3), (2
 
 test(8) :- matriz(M,2,3), contenido(M,2,1,o), puedoColocar(2,vertical,M,1,3).
 test(9) :- matriz(M,2,3), setof((Dir,F,C), puedoColocar(3,Dir,M,F,C),
-                              [(horizontal,1,1), (horizontal,1,2), (horizontal,2,1), (horizontal,2,2)]).
+                              [(horizontal,1,1), (horizontal,2,1)]).
 test(10) :- matriz(M,2,2), setof((Dir,F,C), puedoColocar(2,Dir,M,F,C),
                               [(horizontal,1,1), (horizontal,2,1), (vertical,1,1), (vertical,1,2)]).
 
