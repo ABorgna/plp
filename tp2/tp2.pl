@@ -31,9 +31,10 @@ proximaPosicion(horizontal, F1, C1, F1, C2) :- succ(C1, C2).
 proximaPosicion(vertical, F1, C1, F2, C1) :- succ(F1, F2).
 
 %ubicarUnBarco(+Barco, ?Direccion, +?Tablero, +Fila, +Columna)
-ubicarUnBarco(Barco, Direccion, Tablero, Fila, Columna) :- M is Barco-1, proximaPosicion(Direccion, Fila, Columna, F, C),
-                               contenido(Tablero, Fila, Columna, o),
-                               ubicarUnBarco(M, Direccion, Tablero, F, C).
+ubicarUnBarco(1, _, Tablero, Fila, Columna) :- contenido(Tablero, Fila, Columna, o).
+ubicarUnBarco(Barco, Direccion, Tablero, Fila, Columna) :-
+    M is Barco-1, proximaPosicion(Direccion, Fila, Columna, F, C),
+    contenido(Tablero, Fila, Columna, o), ubicarUnBarco(M, Direccion, Tablero, F, C).
 
 %instanciarCasillero(?X)
 instanciarCasillero(X) :- var(X), X = ~ .
