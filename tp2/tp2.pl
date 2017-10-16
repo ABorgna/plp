@@ -69,6 +69,18 @@ ubicarBarcos([Barco|Barcos], Tablero) :- puedoColocar(Barco, D, Tablero, F, C),
 completarConAgua(Tablero) :- maplist(maplist(instanciarCasillero), Tablero).
 
 %golpear(+Tablero, +NumFila, +NumColumna, -NuevoTab)
+golpear(Tablero, NumFila, NumColumna, NuevoTab) :-
+    matriz(Tablero, CantFilas, CantColumnas),
+    matriz(NuevoTab, CantFilas, CantColumnas),
+    contenido(NuevoTab, NumFila, NumColumna, ~),
+    forall((contenido(Tablero,I,J,_), not((I =:= NumFila, J =:= NumColumna))),
+    (contenido(Tablero, I, J, MismoContenido), contenido(NuevoTab, I, J, MismoContenido))).
+
+matrizIgual(Tablero, NuevoTab) :-
+    matriz(Tablero, CantFilas, CantColumnas),
+    matriz(NuevoTab, CantFilas, CantColumnas),
+    forall((contenido(Tablero,I,J,_)),
+    contenido(NuevoTab, I, J, o)).
 
 % Completar instanciación soportada y justificar.
 %atacar(+Tablero, +Fila, +Columna, -Resultado, -NuevoTab)
