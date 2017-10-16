@@ -73,14 +73,8 @@ golpear(Tablero, NumFila, NumColumna, NuevoTab) :-
     matriz(Tablero, CantFilas, CantColumnas),
     matriz(NuevoTab, CantFilas, CantColumnas),
     contenido(NuevoTab, NumFila, NumColumna, ~),
-    forall((contenido(Tablero,I,J,_), not((I =:= NumFila, J =:= NumColumna))),
-    (contenido(Tablero, I, J, MismoContenido), contenido(NuevoTab, I, J, MismoContenido))).
-
-matrizIgual(Tablero, NuevoTab) :-
-    matriz(Tablero, CantFilas, CantColumnas),
-    matriz(NuevoTab, CantFilas, CantColumnas),
-    forall((contenido(Tablero,I,J,_)),
-    contenido(NuevoTab, I, J, o)).
+    foreach((contenido(Tablero,I,J,MismoContenido), not((I =:= NumFila, J =:= NumColumna))),
+           contenido(NuevoTab, I, J, MismoContenido)).
 
 % Completar instanciación soportada y justificar.
 %atacar(+Tablero, +Fila, +Columna, -Resultado, -NuevoTab)
@@ -89,13 +83,14 @@ atacar(Tablero, Fila, Columna, agua, Tablero) :- golpear(Tablero, Fila, Columna,
 atacar(Tablero, Fila, Columna, hundido, NuevoTab) :-
     contenido(Tablero, Fila, Columna, o),
     golpear(Tablero, Fila, Columna, NuevoTab),
-    forall(adyacenteEnRango(Tablero, Fila, Columna, F, C), not(contenido(Tablero, F, C, o))).
+    foreach(adyacenteEnRango(Tablero, Fila, Columna, F, C), not(contenido(Tablero, F, C, o))).
 
 atacar(Tablero, Fila, Columna, tocado, NuevoTab) :-
     contenido(Tablero, Fila, Columna, o),
     golpear(Tablero, Fila, Columna, NuevoTab),
     adyacenteEnRango(Tablero, Fila, Columna, F, C),
     contenido(Tablero, F, C, o).
+
 %------------------Tests:------------------%
 
 test(1) :- matriz(M,2,3), adyacenteEnRango(M,2,2,2,3).
@@ -125,7 +120,8 @@ test(15) :- T = [[o, _, _],[~, _, o]], golpear(T,2,2,R), R = [[o, _, _],[~, ~, o
 
 test(16) :- T = [[o,o], [~,~], [~,o]], atacar(T,1,1,Res,R), Res = tocado, R = [[~,o], [~,~], [~,o]].
 test(17) :- T = [[o,o], [~,~], [~,o]], atacar(T,3,1,Res,R), Res = agua, R = T.
-test(18) :- T = [[o,o], [~,~], [~,o]], atacar(T,3,2,Res,R), Res = hundido, R = [[~,o], [~,~], [~,~]].
+test(18) :- T = [[o,o], [~,~], [~,o]], atacar(T,3,2,Res,R), Res = hundido, R = [[o,o], [~,~], [~,~]].
 
-tests :- forall(between(1,13,N), test(N)). % Cambiar el 2 por la cantidad de tests que tengan.
+tests(N) :- forall(between(1,N,I), test(I)). % Cambiar el 2 por la cantidad de tests que tengan.
+tests :- tests(18).
 
