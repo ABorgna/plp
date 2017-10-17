@@ -68,7 +68,7 @@ ubicarBarcos([Barco|Barcos], Tablero) :- puedoColocar(Barco, D, Tablero, F, C),
 %completarConAgua(+?Tablero)
 completarConAgua(Tablero) :- maplist(maplist(instanciarCasillero), Tablero).
 
-%golpear(+Tablero, +NumFila, +NumColumna, -NuevoTab)
+%golpear(+Tablero, ?NumFila, ?NumColumna, ?NuevoTab)
 golpear(Tablero, NumFila, NumColumna, NuevoTab) :-
     matriz(Tablero, CantFilas, CantColumnas),
     matriz(NuevoTab, CantFilas, CantColumnas),
@@ -77,7 +77,16 @@ golpear(Tablero, NumFila, NumColumna, NuevoTab) :-
            contenido(NuevoTab, I, J, MismoContenido)).
 
 % Completar instanciación soportada y justificar.
-%atacar(+Tablero, +Fila, +Columna, -Resultado, -NuevoTab)
+%atacar(+Tablero, ?Fila, ?Columna, ?Resultado, ?NuevoTab)
+%
+% Notar que cambiamos el modo de los parámetros de atacar y golpear,
+% indicando que son reversibles en todos sus parámetros excepto el Tablero inicial
+%
+% Tablero debe estar siempre instanciado pues así lo requiere matriz dentro de golpear
+% Filas y Columna se generan a partir del predicado nth1(?Index, ?List, ?Elem)
+% El Resultado solo puede estar en {agua, hundido, tocado}
+% El NuevoTab se puede fijar y de esta forma filtrar las soluciones posibles
+
 atacar(Tablero, Fila, Columna, agua, Tablero) :- golpear(Tablero, Fila, Columna, Tablero).
 
 atacar(Tablero, Fila, Columna, hundido, NuevoTab) :-
@@ -122,6 +131,6 @@ test(16) :- T = [[o,o], [~,~], [~,o]], atacar(T,1,1,Res,R), Res = tocado, R = [[
 test(17) :- T = [[o,o], [~,~], [~,o]], atacar(T,3,1,Res,R), Res = agua, R = T.
 test(18) :- T = [[o,o], [~,~], [~,o]], atacar(T,3,2,Res,R), Res = hundido, R = [[o,o], [~,~], [~,~]].
 
-tests(N) :- forall(between(1,N,I), test(I)). % Cambiar el 2 por la cantidad de tests que tengan.
+tests(N) :- forall(between(1,N,I), test(I)).
 tests :- tests(18).
 
