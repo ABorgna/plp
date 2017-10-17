@@ -85,7 +85,7 @@ golpear(Tablero, NumFila, NumColumna, NuevoTab) :-
 % Tablero debe estar siempre instanciado pues así lo requiere matriz dentro de golpear
 % Filas y Columna se generan a partir del predicado nth1(?Index, ?List, ?Elem)
 % El Resultado solo puede estar en {agua, hundido, tocado}
-% El NuevoTab se puede fijar y de esta forma filtrar las soluciones posibles
+% El NuevoTab se puede fijar y de esta forma filtrar las soluciones posibles, dado que golpear se encarga de instanciar su contenido. NuevoTab se instancia respecto del contenido ya instanciado del Tablero original.
 
 atacar(Tablero, Fila, Columna, agua, Tablero) :- golpear(Tablero, Fila, Columna, Tablero).
 
@@ -131,6 +131,10 @@ test(16) :- T = [[o,o], [~,~], [~,o]], atacar(T,1,1,Res,R), Res = tocado, R = [[
 test(17) :- T = [[o,o], [~,~], [~,o]], atacar(T,3,1,Res,R), Res = agua, R = T.
 test(18) :- T = [[o,o], [~,~], [~,o]], atacar(T,3,2,Res,R), Res = hundido, R = [[o,o], [~,~], [~,~]].
 
+% reversibilidad en filas y columnas (en los anteriores se puede ver reversibilidad en Res y R, dado que no están instanciados antes de atacar)
+test(19) :- T = [[o,o], [~,~], [~,o]], atacar(T,F,C,Res,R), Res = hundido, R = [[o,o], [~,~], [~,~]], F = 3, C = 2.
+test(20) :- T = [[o,o], [~,~], [~,o]], atacar(T,F,C,Res,R), Res = hundido, R = [[o,o], [~,~], [~,~]], C = 2, F = 3.
+
 tests(N) :- forall(between(1,N,I), test(I)).
-tests :- tests(18).
+tests :- tests(20).
 
