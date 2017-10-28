@@ -11,7 +11,7 @@ import Test.HUnit
 búsquedaDelTesoro :: Eq a => a -> (a -> Bool) -> Diccionario a a -> Maybe a
 búsquedaDelTesoro x esTesoro dicc = head $ dropWhile niTesoroNiVacio (iterate f $ Just x)
   where f x = obtener (fromJust x) dicc
-	niTesoroNiVacio x = isJust x && not (esTesoro $ fromJust x)
+        niTesoroNiVacio x = isJust x && not (esTesoro $ fromJust x)
 
 {- Diccionarios de prueba: -}
 
@@ -100,3 +100,4 @@ testsEj9 = test [
 testsEj10 = test [
     Just "alfajor" ~=? búsquedaDelTesoro "inicio" ((=='a').head) dicc2
   ]
+

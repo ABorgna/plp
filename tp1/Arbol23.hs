@@ -37,17 +37,28 @@ pad i = replicate i ' '
 {- Funciones pedidas. -}
 
 foldA23 :: (a->c) -> (b->c->c->c) -> (b->b->c->c->c->c) -> Arbol23 a b -> c
-foldA23 f g h (Hoja x) = f x
-foldA23 f g h (Dos x t1 t2) = g x (foldA23 f g h t1) (foldA23 f g h t2)
-foldA23 f g h (Tres x y t1 t2 t3) = h x y (foldA23 f g h t1) (foldA23 f g h t2) (foldA23 f g h t3)
+foldA23 f g h a = case a of
+                    (Hoja x) -> f x
+                    (Dos x t1 t2) -> g x (fld t1) (fld t2)
+                    (Tres x y t1 t2 t3) -> h x y (fld t1) (fld t2) (fld t3)
+    where fld = foldA23 f g h
 
 --Lista en preorden de los internos del árbol.
+    --
+    -- Componemos funciones que construyen listas en vez de concatenarlas
+    -- explícitamente pues la concatenación tarda tiempo lineal en el tamaño
+    -- del primer argumento (tiene que reconstruir la lista),
+    -- por lo que `internos` tardaría tiempo cuadrático en la cantidad de nodos
+    --
+    -- En cambio si componemos funciones y recién las evaluamos al final
+    -- podemos hacer todo el proceso en tiempo lineal
 internos :: Arbol23 a b -> [b]
 internos arbol = foldA23 (const id)
                          (\x r1 r2 -> (x:) . r1 . r2)
                          (\x y r1 r2 r3 -> (x:) . (y:) . r1 . r2 . r3) arbol []
 
 --Lista las hojas de izquierda a derecha.
+    -- Ver el comentario de `internos`
 hojas :: Arbol23 a b -> [a]
 hojas a = foldA23 (:) (\x r1 r2 -> r1 . r2) (\x y r1 r2 r3 -> r1 . r2 . r3) a []
 
@@ -56,8 +67,8 @@ esHoja = foldA23 (const True) (\x r1 r2 -> False) (\x y r1 r2 r3 -> False)
 
 mapA23 :: (a -> c) -> (b -> d) -> Arbol23 a b -> Arbol23 c d
 mapA23 fa fb = foldA23 (Hoja . fa)
-                       (\x r1 r2 -> Dos (fb x) r1 r2)
-                       (\x y r1 r2 r3 -> Tres (fb x) (fb y) r1 r2 r3)
+                       (Dos . fb)
+                       (\x y -> Tres (fb x) (fb y))
 
 
 --Ejemplo de uso de mapA23.
@@ -69,13 +80,11 @@ incrementarHojas = mapA23 (+1) id
 --Trunca el árbol hasta un determinado nivel. Cuando llega a 0, reemplaza el resto del árbol por una hoja con el valor indicado.
 --Funciona para árboles infinitos.
 truncar :: a -> Integer -> Arbol23 a b -> Arbol23 a b
-truncar = f
-    where f h n t = foldA23 fnHoja fnDos fnTres t h n
-          fnHoja x h i = if i == 0 then Hoja h else Hoja x
-          fnDos x r1 r2 h i = if i == 0 then Hoja h else Dos x (r1 h (i-1)) (r2 h (i-1))
-          fnTres x y r1 r2 r3 h i = if i == 0
-                                       then Hoja h
-                                       else Tres x y (r1 h (i-1)) (r2 h (i-1)) (r3 h (i-1))
+truncar h n t = foldA23 fnHoja fnDos fnTres t n
+    where cutAt i t = if i == 0 then Hoja h else t
+          fnHoja x i = cutAt i $ Hoja x
+          fnDos x r1 r2 i = cutAt i $ Dos x (r1 $ i-1) (r2 $ i-1)
+          fnTres x y r1 r2 r3 i = cutAt i $ Tres x y (r1 $ i-1) (r2 $ i-1) (r3 $ i-1)
 
 --Evalúa las funciones tomando los valores de los hijos como argumentos.
 --En el caso de que haya 3 hijos, asocia a izquierda.
@@ -101,3 +110,4 @@ arbolito3 = Dos (+) (Tres (*) (-) (Hoja 1) (Hoja 2) (Hoja 3)) (incrementarHojas 
 arbolito4 :: Arbol23 Int Char
 arbolito4 = Dos 'p' (Dos 'l' (Dos 'g' (Hoja 5) (Hoja 2)) (Tres 'r' 'a' (Hoja 0)(Hoja 1)(Hoja 12)))
                     (Dos 'p' (Tres 'n' 'd' (Hoja (-3))(Hoja 4)(Hoja 9)) (Dos 'e' (Hoja 20)(Hoja 7)))
+
