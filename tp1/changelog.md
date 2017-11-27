@@ -6,11 +6,10 @@ Cambios
 * Sacar argumentos innecesarios en mapA23
 * Refactorizar `truncar` para hacerlo mas entendible
 * Cambiar la comparación con [] por un `null` en `obtener`
+* Test del ej7 más relacionado a la función `definir`
 
 Dudas
 -----
 
 * La corrección dice que los tests no compilan,
-    pero funcionan bien en mi pc (ghc 8.2.1)
-    En los labos no los pude correr porque no tienen HUnit
-
+    pero nos funcionan bien con GHC 8.0.2 y HUnit 1.6.0.0

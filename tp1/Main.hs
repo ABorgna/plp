@@ -69,6 +69,8 @@ testsEj6 = test [
 
 testsEj7 = test [
      0 ~=? (length . concat . fmap hojas . estructura) (vacio (<) :: Diccionario Int Int),
+
+     -- dicc1 se crea con definirVarias que a su vez llama a definir
      [(-10,"Chau"),(0,"Hola"),(2,"etc."),(9,"a"),(15,"Felicidades")] ~=? (concat . fmap hojas . estructura) dicc1,
      [(-10,"Chau"),(0,"Hola"),(1,"Hi"),(2,"etc."),(9,"a"),(15,"Felicidades")] ~=? (concat . fmap hojas . estructura . definir 1 "Hi") dicc1
   ]
