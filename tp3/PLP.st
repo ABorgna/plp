@@ -17,6 +17,15 @@ nextFrom: puntoDeOrigen
 Direction class
 	instanceVariableNames: ''!
 
+!Direction class methodsFor: 'evaluating' stamp: 'PLP 10/9/2017 17:54'!
+nextFrom: puntoDeOrigen
+	^ self subclassResponsibility ! !
+
+
+!Direction class methodsFor: 'instance-creation' stamp: 'PLP 10/9/2017 17:59'!
+southwest
+	^Southwest new! !
+
 !Direction class methodsFor: 'instance-creation' stamp: 'PLP 10/9/2017 17:53'!
 north
 	^North new! !
@@ -25,80 +34,25 @@ north
 south
 	^South new! !
 
+!Direction class methodsFor: 'instance-creation' stamp: 'PLP 10/9/2017 17:59'!
+northwest
+	^Northwest new! !
+
 !Direction class methodsFor: 'instance-creation' stamp: 'PLP 10/9/2017 17:53'!
 east
 	^East new! !
 
 !Direction class methodsFor: 'instance-creation' stamp: 'PLP 10/9/2017 17:59'!
-southwest
-	^Southwest new! !
-
-!Direction class methodsFor: 'instance-creation' stamp: 'PLP 10/9/2017 17:59'!
-northwest
-	^Northwest new! !
+northeast
+	^Northeast new! !
 
 !Direction class methodsFor: 'instance-creation' stamp: 'PLP 10/9/2017 17:53'!
 west
 	^West new! !
 
 !Direction class methodsFor: 'instance-creation' stamp: 'PLP 10/9/2017 17:59'!
-northeast
-	^Northeast new! !
-
-!Direction class methodsFor: 'instance-creation' stamp: 'PLP 10/9/2017 17:59'!
 southeast
 	^Southeast new! !
-
-
-!Direction class methodsFor: 'evaluating' stamp: 'PLP 10/9/2017 17:54'!
-nextFrom: puntoDeOrigen
-	^ self subclassResponsibility ! !
-
-
-Object subclass: #DisabledState
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PLP'!
-!DisabledState commentStamp: '<historical>' prior: 0!
-Please comment me using the following template inspired by Class Responsibility Collaborator (CRC) design:
-
-For the Class part:  State a one line summary. For example, "I represent a paragraph of text".
-
-For the Responsibility part: Three sentences about my main responsibilities - what I do, what I know.
-
-For the Collaborators Part: State my main collaborators and one line about how I interact with them. 
-
-Public API and Key Messages
-
-- message one   
-- message two 
-- (for bonus points) how to create instances.
-
-   One simple example is simply gorgeous.
- 
-Internal Representation and Key Implementation Points.
-
-
-    Implementation Points!
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-DisabledState class
-	instanceVariableNames: ''!
-
-!DisabledState class methodsFor: 'enumerating' stamp: 'ab 11/29/2017 00:18'!
-ifNotAbleDo: aBlock
-	aBlock value! !
-
-!DisabledState class methodsFor: 'enumerating' stamp: 'ab 11/29/2017 00:18'!
-ifAbleDo: aBlock
-	^ self! !
-
-
-!DisabledState class methodsFor: 'testing' stamp: 'ab 11/29/2017 00:20'!
-isDisabled
-	^ true! !
 
 
 Direction subclass: #East
@@ -118,51 +72,6 @@ East class
 nextFrom: puntoDeOrigen
 
 	^(puntoDeOrigen x + 1)@(puntoDeOrigen y)! !
-
-
-Object subclass: #EnabledState
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PLP'!
-!EnabledState commentStamp: '<historical>' prior: 0!
-Please comment me using the following template inspired by Class Responsibility Collaborator (CRC) design:
-
-For the Class part:  State a one line summary. For example, "I represent a paragraph of text".
-
-For the Responsibility part: Three sentences about my main responsibilities - what I do, what I know.
-
-For the Collaborators Part: State my main collaborators and one line about how I interact with them. 
-
-Public API and Key Messages
-
-- message one   
-- message two 
-- (for bonus points) how to create instances.
-
-   One simple example is simply gorgeous.
- 
-Internal Representation and Key Implementation Points.
-
-
-    Implementation Points!
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-EnabledState class
-	instanceVariableNames: ''!
-
-!EnabledState class methodsFor: 'testing' stamp: 'ab 11/29/2017 00:17'!
-ifAbleDo: aBlock
-	aBlock value! !
-
-!EnabledState class methodsFor: 'testing' stamp: 'ab 11/29/2017 00:20'!
-isDisabled
-	^ false! !
-
-!EnabledState class methodsFor: 'testing' stamp: 'ab 11/29/2017 00:17'!
-ifNotAbleDo: aBlock
-	^ self! !
 
 
 Object subclass: #Flag
@@ -239,6 +148,15 @@ Internal Representation and Key Implementation Points.
     Implementation Points!
 
 
+!Game methodsFor: 'initialization' stamp: 'ab 11/28/2017 23:07'!
+initializeWithX: anInteger Y: anInteger2 trapLocations: trapLocations flagLocations: flagLocations
+	terrain := (Terrain dimX: anInteger dimY: anInteger2) .
+	self items: Trap at: trapLocations .
+	flags := self items: Flag at: flagLocations .
+	teams := OrderedCollection new .
+	currentTeamIndex := 1 .! !
+
+
 !Game methodsFor: 'as yet unclassified' stamp: 'ab 11/28/2017 22:57'!
 currentWinners
 	| teamFlags flagsPerTeam maxFlags teamNames |
@@ -251,13 +169,6 @@ currentWinners
 	teamNames := teams collect: [ :t | t name ] .
 	^ teamNames select: [ :tn | (flagsPerTeam at: tn ifAbsent: {}) size = maxFlags ]! !
 
-!Game methodsFor: 'as yet unclassified' stamp: 'ab 11/8/2017 14:43'!
-registerTeam: aTeamName playerLocations: aPlayerCollection 
-	| players |
-	players := aPlayerCollection pairsCollect: [ :pos :unitType  |
-		unitType new: terrain with: pos and: aTeamName ] .
-	teams add: (GameTeam new: aTeamName with: players) .! !
-
 !Game methodsFor: 'as yet unclassified' stamp: 'ab 11/28/2017 23:20'!
 items: aClass at: positions
 	^ (1 to: positions size) asOrderedCollection collect: [ :i |
@@ -266,6 +177,13 @@ items: aClass at: positions
 		terrain at: (positions at: i) put: obj .
 		obj
 	]! !
+
+!Game methodsFor: 'as yet unclassified' stamp: 'ab 11/8/2017 14:43'!
+registerTeam: aTeamName playerLocations: aPlayerCollection 
+	| players |
+	players := aPlayerCollection pairsCollect: [ :pos :unitType  |
+		unitType new: terrain with: pos and: aTeamName ] .
+	teams add: (GameTeam new: aTeamName with: players) .! !
 
 !Game methodsFor: 'as yet unclassified' stamp: 'ab 11/8/2017 15:06'!
 moveCharacter: aMemberIndex to: aDirection steps: steps
@@ -278,15 +196,6 @@ moveCharacter: aMemberIndex to: aDirection steps: steps
 !Game methodsFor: 'handling' stamp: 'ab 11/8/2017 14:56'!
 pass
 	currentTeamIndex := (currentTeamIndex % teams size) + 1! !
-
-
-!Game methodsFor: 'initialization' stamp: 'ab 11/28/2017 23:07'!
-initializeWithX: anInteger Y: anInteger2 trapLocations: trapLocations flagLocations: flagLocations
-	terrain := (Terrain dimX: anInteger dimY: anInteger2) .
-	self items: Trap at: trapLocations .
-	flags := self items: Flag at: flagLocations .
-	teams := OrderedCollection new .
-	currentTeamIndex := 1 .! !
 
 
 !Game methodsFor: 'accessing' stamp: 'ab 11/8/2017 14:48'!
@@ -332,11 +241,6 @@ Internal Representation and Key Implementation Points.
     Implementation Points!
 
 
-!GameTeam methodsFor: 'accessing' stamp: 'ab 11/7/2017 18:16'!
-name
-	^ name! !
-
-
 !GameTeam methodsFor: 'initialization' stamp: 'gflan 11/23/2017 17:02'!
 initialize: aString with: aCollection 
 	name := aString .
@@ -347,6 +251,11 @@ initialize: aString with: aCollection
 !GameTeam methodsFor: 'as yet unclassified' stamp: 'ab 11/7/2017 18:14'!
 members
 	^ members! !
+
+
+!GameTeam methodsFor: 'accessing' stamp: 'ab 11/7/2017 18:16'!
+name
+	^ name! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -500,20 +409,6 @@ Internal Representation and Key Implementation Points.
     Implementation Points!
 
 
-
-!Terrain methodsFor: 'removing' stamp: 'gflan 11/23/2017 17:14'!
-remove: anObject 
-	matrix replaceAll: anObject  with: nil! !
-
-
-!Terrain methodsFor: 'as yet unclassified ' stamp: 'ab 11/7/2017 17:19'!
-contains: aPoint 
-	| inRangeX inRangeY |
-	inRangeX := (aPoint x > 0) & (aPoint x <= matrix columnCount).
-	inRangeY := (aPoint y > 0) & (aPoint y <= matrix rowCount) .
-	^ inRangeX & inRangeY ! !
-
-
 !Terrain methodsFor: 'as yet unclassified' stamp: 'ab 11/7/2017 17:17'!
 dimX: anInteger dimY: anInteger2 
 	matrix := Matrix rows: anInteger2 columns: anInteger.! !
@@ -523,30 +418,42 @@ elementsAround: aUnit satisfying: aBlockClosure
 	^ (self elementsAround: aUnit) select: aBlockClosure .! !
 
 
-!Terrain methodsFor: 'enumerating' stamp: 'ab 11/7/2017 17:30'!
-select: aBlockClosure 
-	^ (matrix asBag select: [:x | x isNotNil ]) select: aBlockClosure ! !
-
-
 !Terrain methodsFor: 'accessing' stamp: 'ab 11/7/2017 17:21'!
 at: aPoint
 	^ matrix at: aPoint y at: aPoint x ! !
 
-!Terrain methodsFor: 'accessing' stamp: 'ab 11/7/2017 18:00'!
-elementsAround: aUnit 
-	| points objects |
-	points := aUnit location eightNeighbors select: [:x | self contains: x] .
-	points := points select: [ :p | (self at: p) isNotNil ] .
-	objects := points collect: [ :p | self at: p ] .
-	^ aUnit selectSeenFrom: objects! !
+!Terrain methodsFor: 'accessing' stamp: 'AutoDeprecationRefactoring 11/28/2017 23:36'!
+visibleAt: aPoint
+	^ (self at: aPoint) ifNotNil: [ :obj | ^ obj getIfVisible ]! !
 
 !Terrain methodsFor: 'accessing' stamp: 'ab 11/7/2017 17:20'!
 at: aPoint put: anObject
 	matrix at: aPoint y at: aPoint x put: anObject ! !
 
-!Terrain methodsFor: 'accessing' stamp: 'AutoDeprecationRefactoring 11/28/2017 23:36'!
-visibleAt: aPoint
-	^ (self at: aPoint) ifNotNil: [ :obj | ^ obj getIfVisible ]! !
+!Terrain methodsFor: 'accessing' stamp: 'ab 11/30/2017 20:03'!
+elementsAround: aUnit 
+	| points |
+	points := aUnit location eightNeighbors select: [:x | self contains: x] .
+	points := points select: [ :p | (self at: p) isNotNil ] .
+	^ aUnit selectSeenFrom: (points collect: [ :p | self at: p ]) .! !
+
+
+!Terrain methodsFor: 'removing' stamp: 'gflan 11/23/2017 17:14'!
+remove: anObject 
+	matrix replaceAll: anObject  with: nil! !
+
+
+!Terrain methodsFor: 'enumerating' stamp: 'ab 11/7/2017 17:30'!
+select: aBlockClosure 
+	^ (matrix asBag select: [:x | x isNotNil ]) select: aBlockClosure ! !
+
+
+!Terrain methodsFor: 'as yet unclassified ' stamp: 'ab 11/7/2017 17:19'!
+contains: aPoint 
+	| inRangeX inRangeY |
+	inRangeX := (aPoint x > 0) & (aPoint x <= matrix columnCount).
+	inRangeY := (aPoint y > 0) & (aPoint y <= matrix rowCount) .
+	^ inRangeX & inRangeY ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -567,11 +474,6 @@ TestCase subclass: #TestsEx1
 	poolDictionaries: ''
 	category: 'PLP'!
 
-!TestsEx1 methodsFor: 'testing' stamp: 'PLP 10/12/2017 11:54'!
-test1_1_canCreateTrapsAndFlags
-	self assert: (Flag new isKindOf: Flag).
-	self assert: (Trap new isKindOf: Trap).! !
-
 !TestsEx1 methodsFor: 'testing' stamp: 'Anonymous 10/29/2017 19:17'!
 test1_2_visibilityAndValue
 	| flag trap |
@@ -581,6 +483,11 @@ test1_2_visibilityAndValue
 	self assert: (trap isVisible not).
 	self assert: (flag value) equals: flag.
 	self assert: (trap value isNil).! !
+
+!TestsEx1 methodsFor: 'testing' stamp: 'PLP 10/12/2017 11:54'!
+test1_1_canCreateTrapsAndFlags
+	self assert: (Flag new isKindOf: Flag).
+	self assert: (Trap new isKindOf: Trap).! !
 
 !TestsEx1 methodsFor: 'testing' stamp: 'Anonymous 10/29/2017 19:30'!
 test1_3_flagTeams
@@ -762,98 +669,6 @@ TestCase subclass: #TestsEx4
 	poolDictionaries: ''
 	category: 'PLP'!
 
-!TestsEx4 methodsFor: 'testing' stamp: 'PLP 10/13/2017 09:51'!
-test4_2_directions
-| terrain bob dora doc |
-	terrain := self class terrain.
-	dora := Explorer new: terrain with: (2@3) and: #verde.
-	bob := Engineer new: terrain with: (2@1) and: #verde.
-	doc := Medic new: terrain with: (3@4) and: #verde.
-	
-	self assert: (bob canMoveTo: Direction northeast).
-	self assert: (doc canMoveTo: Direction west).
-	self assert: (dora canMoveTo: Direction east).
-	self assert: (dora canMoveTo: Direction south) not.
-	self assert: (dora canMoveTo: Direction northeast) not.
-	self assert: (doc canMoveTo: Direction north) not.
-	
-	bob disable.
-	
-	self assert: (bob canMoveTo: Direction northeast) not.! !
-
-!TestsEx4 methodsFor: 'testing' stamp: 'PLP 10/13/2017 10:30'!
-test4_4_actions
-| terrain bob dora doc flag trap |
-	terrain := self class terrain.
-	dora := Explorer new: terrain with: (2@3) and: #verde.
-	bob := Engineer new: terrain with: (2@1) and: #verde.
-	doc := Medic new: terrain with: (3@4) and: #verde.
-	flag := terrain at: (2@2).
-	trap := terrain at: (1@2).
-	
-	dora disable.
-	
-	self assert: (trap isKindOf: Trap).
-	self assert: flag team isNil.
-	self assert: dora canMove not.
-	
-	bob action value: trap.
-	doc action value: dora.
-	dora action value: flag.
-	
-	self assert: (terrain at: (1@2)) isNil.
-	self assert: flag team equals: #verde.
-	self assert: dora canMove.
-	! !
-
-!TestsEx4 methodsFor: 'testing' stamp: 'PLP 10/13/2017 10:38'!
-test4_5_interactWithAllElements
-| terrain bob dora doc |
-	terrain := self class terrain.
-	dora := Explorer new: terrain with: (2@3) and: #verde.
-	bob := Engineer new: terrain with: (3@2) and: #verde.
-	doc := Medic new: terrain with: (3@4) and: #verde.
-	
-	dora disable.
-	
-	self assert: ((terrain at: (3@3)) isKindOf: Trap).
-	self assert: ((terrain at: (4@2)) isKindOf: Trap).
-	self assert: (terrain at: (2@2)) team isNil.
-	self assert: dora canMove not.
-	
-	bob interactWithAllElements.
-	doc interactWithAllElements.
-	dora interactWithAllElements.
-	
-	self assert: (terrain at: (3@3)) isNil.
-	self assert: (terrain at: (4@2)) isNil.
-	self assert: (terrain at: (2@2)) team equals: #verde.
-	self assert: dora canMove.
-	! !
-
-!TestsEx4 methodsFor: 'testing' stamp: 'PLP 10/15/2017 01:20'!
-test4_3_targets
-"Cada personaje tiene su objetivo. El mensaje target debe devolver un bloque que,
-dado un objeto, indique si este es un objetivo para el personaje receptor."
-| terrain bob dora doc dean |
-	terrain := self class terrain.
-	dora := Explorer new: terrain with: (2@3) and: #verde.
-	dean := Explorer new: terrain with: (2@4) and: #rojo.
-	bob := Engineer new: terrain with: (2@1) and: #verde.
-	doc := Medic new: terrain with: (3@4) and: #verde.
-	
-	dora disable.
-	dean disable.
-	
-	self assert: (dora target value: Flag new).
-	self assert: (dora target value: Trap new) not.
-	self assert: (doc target value: dora).
-	self assert: (doc target value: bob) not.
-	self assert: (doc target value: dean) not.
-	self assert: (doc target value: Trap new) not.
-	self assert: (bob target value: Trap new).
-	self assert: (bob target value: Flag new) not.! !
-
 !TestsEx4 methodsFor: 'testing' stamp: 'PLP 10/13/2017 09:37'!
 test4_1_mobility
 | terrain bob dora doc |
@@ -882,6 +697,31 @@ test4_1_mobility
 	self assert: doc canHeal not.
 	self assert: doc canMove not.
 	self should: [ doc healedBy: doc ] raise: Exception.! !
+
+!TestsEx4 methodsFor: 'testing' stamp: 'PLP 10/13/2017 10:38'!
+test4_5_interactWithAllElements
+| terrain bob dora doc |
+	terrain := self class terrain.
+	dora := Explorer new: terrain with: (2@3) and: #verde.
+	bob := Engineer new: terrain with: (3@2) and: #verde.
+	doc := Medic new: terrain with: (3@4) and: #verde.
+	
+	dora disable.
+	
+	self assert: ((terrain at: (3@3)) isKindOf: Trap).
+	self assert: ((terrain at: (4@2)) isKindOf: Trap).
+	self assert: (terrain at: (2@2)) team isNil.
+	self assert: dora canMove not.
+	
+	bob interactWithAllElements.
+	doc interactWithAllElements.
+	dora interactWithAllElements.
+	
+	self assert: (terrain at: (3@3)) isNil.
+	self assert: (terrain at: (4@2)) isNil.
+	self assert: (terrain at: (2@2)) team equals: #verde.
+	self assert: dora canMove.
+	! !
 
 !TestsEx4 methodsFor: 'testing' stamp: 'PLP 10/15/2017 02:04'!
 test4_6_moving
@@ -936,6 +776,73 @@ test4_6_moving
 	
 	self assert: bob location equals: 4 @ 1.	"Se movió 2 lugares y se chocó con la bandera."
 	self assert: ((terrain at: 4 @ 2) isNil).! !
+
+!TestsEx4 methodsFor: 'testing' stamp: 'PLP 10/13/2017 09:51'!
+test4_2_directions
+| terrain bob dora doc |
+	terrain := self class terrain.
+	dora := Explorer new: terrain with: (2@3) and: #verde.
+	bob := Engineer new: terrain with: (2@1) and: #verde.
+	doc := Medic new: terrain with: (3@4) and: #verde.
+	
+	self assert: (bob canMoveTo: Direction northeast).
+	self assert: (doc canMoveTo: Direction west).
+	self assert: (dora canMoveTo: Direction east).
+	self assert: (dora canMoveTo: Direction south) not.
+	self assert: (dora canMoveTo: Direction northeast) not.
+	self assert: (doc canMoveTo: Direction north) not.
+	
+	bob disable.
+	
+	self assert: (bob canMoveTo: Direction northeast) not.! !
+
+!TestsEx4 methodsFor: 'testing' stamp: 'PLP 10/13/2017 10:30'!
+test4_4_actions
+| terrain bob dora doc flag trap |
+	terrain := self class terrain.
+	dora := Explorer new: terrain with: (2@3) and: #verde.
+	bob := Engineer new: terrain with: (2@1) and: #verde.
+	doc := Medic new: terrain with: (3@4) and: #verde.
+	flag := terrain at: (2@2).
+	trap := terrain at: (1@2).
+	
+	dora disable.
+	
+	self assert: (trap isKindOf: Trap).
+	self assert: flag team isNil.
+	self assert: dora canMove not.
+	
+	bob action value: trap.
+	doc action value: dora.
+	dora action value: flag.
+	
+	self assert: (terrain at: (1@2)) isNil.
+	self assert: flag team equals: #verde.
+	self assert: dora canMove.
+	! !
+
+!TestsEx4 methodsFor: 'testing' stamp: 'PLP 10/15/2017 01:20'!
+test4_3_targets
+"Cada personaje tiene su objetivo. El mensaje target debe devolver un bloque que,
+dado un objeto, indique si este es un objetivo para el personaje receptor."
+| terrain bob dora doc dean |
+	terrain := self class terrain.
+	dora := Explorer new: terrain with: (2@3) and: #verde.
+	dean := Explorer new: terrain with: (2@4) and: #rojo.
+	bob := Engineer new: terrain with: (2@1) and: #verde.
+	doc := Medic new: terrain with: (3@4) and: #verde.
+	
+	dora disable.
+	dean disable.
+	
+	self assert: (dora target value: Flag new).
+	self assert: (dora target value: Trap new) not.
+	self assert: (doc target value: dora).
+	self assert: (doc target value: bob) not.
+	self assert: (doc target value: dean) not.
+	self assert: (doc target value: Trap new) not.
+	self assert: (bob target value: Trap new).
+	self assert: (bob target value: Flag new) not.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1083,13 +990,13 @@ Internal Representation and Key Implementation Points.
     Implementation Points!
 
 
-!Trap methodsFor: 'accesing' stamp: 'Anonymous 10/29/2017 19:13'!
-value
-	^nil.! !
-
 !Trap methodsFor: 'accesing' stamp: 'ab 11/28/2017 23:36'!
 getIfVisible
 	^ nil! !
+
+!Trap methodsFor: 'accesing' stamp: 'Anonymous 10/29/2017 19:13'!
+value
+	^nil.! !
 
 !Trap methodsFor: 'accesing' stamp: 'Anonymous 10/29/2017 18:54'!
 isVisible
@@ -1097,7 +1004,7 @@ isVisible
 
 
 Object subclass: #Unit
-	instanceVariableNames: 'state terrain location team'
+	instanceVariableNames: 'isDisabled terrain location team'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'PLP'!
@@ -1124,25 +1031,53 @@ Internal Representation and Key Implementation Points.
     Implementation Points!
 
 
-!Unit methodsFor: 'ej4' stamp: 'ab 11/29/2017 00:11'!
-disable
-	state := DisabledState.! !
+!Unit methodsFor: 'as yet unclassified' stamp: 'ab 11/7/2017 17:40'!
+team
+	^ team! !
+
+!Unit methodsFor: 'as yet unclassified' stamp: 'ab 11/28/2017 23:36'!
+getIfVisible
+	"A unit is always visible"
+	^ self! !
+
+!Unit methodsFor: 'as yet unclassified' stamp: 'ab 11/7/2017 17:45'!
+selectSeenFrom: aCollection 
+	^ aCollection select: [:x | x isVisible ] .! !
+
+!Unit methodsFor: 'as yet unclassified' stamp: 'ab 11/7/2017 17:54'!
+location
+	^ location! !
+
+
+!Unit methodsFor: 'initialization' stamp: 'ab 11/30/2017 19:14'!
+initializeIn: aTerrain with: aPoint and: aString 
+	team := aString .
+	isDisabled := false .
+	terrain := aTerrain .
+	location := aPoint .
+	aTerrain at: aPoint put: self.! !
+
 
 !Unit methodsFor: 'ej4' stamp: 'Anonymous 11/3/2017 18:09'!
 canHeal
 	^ self subclassResponsibility! !
 
-!Unit methodsFor: 'ej4' stamp: 'ab 11/28/2017 23:22'!
-canMoveTo: aDirection 
-	| nextLocation nextLocationIsValid |
-	nextLocation := aDirection nextFrom: location. 
-	nextLocationIsValid := [ (terrain contains: nextLocation) 
-			and: [
-				(terrain at: nextLocation) isNil 
-				or: [ (terrain at: nextLocation) isVisible not ] 
-			] 
-		]. 
-	^ self canMove and: nextLocationIsValid! !
+!Unit methodsFor: 'ej4' stamp: 'ab 11/30/2017 19:15'!
+canMove
+	^isDisabled not.! !
+
+!Unit methodsFor: 'ej4' stamp: 'ab 11/30/2017 19:15'!
+disable
+	isDisabled := true.! !
+
+!Unit methodsFor: 'ej4' stamp: 'ab 11/30/2017 19:16'!
+healedBy: aUnit
+	aUnit canHeal ifFalse: [Exception new signal: 'Solo medicos pueden curar unidades'].
+	isDisabled := false . ! !
+
+!Unit methodsFor: 'ej4' stamp: 'Anonymous 11/3/2017 20:32'!
+move: anInteger to: aDirection
+	anInteger timesRepeat: [ self moveTo: aDirection ] ! !
 
 !Unit methodsFor: 'ej4' stamp: 'Anonymous 11/3/2017 19:57'!
 action
@@ -1159,61 +1094,29 @@ moveTo: aDirection
 	content ifNil: [self interactWithAllElements] ifNotNil: [ self disable ].
 	^self! !
 
-!Unit methodsFor: 'ej4' stamp: 'Anonymous 11/3/2017 20:32'!
-move: anInteger to: aDirection
-	anInteger timesRepeat: [ self moveTo: aDirection ] ! !
-
-!Unit methodsFor: 'ej4' stamp: 'ab 11/29/2017 00:10'!
-canMove
-	^state isDisabled not.! !
+!Unit methodsFor: 'ej4' stamp: 'ab 11/28/2017 23:22'!
+canMoveTo: aDirection 
+	| nextLocation nextLocationIsValid |
+	nextLocation := aDirection nextFrom: location. 
+	nextLocationIsValid := [ (terrain contains: nextLocation) 
+			and: [
+				(terrain at: nextLocation) isNil 
+				or: [ (terrain at: nextLocation) isVisible not ] 
+			] 
+		]. 
+	^ self canMove and: nextLocationIsValid! !
 
 !Unit methodsFor: 'ej4' stamp: 'Anonymous 11/3/2017 18:55'!
 target
 	^ self subclassResponsibility ! !
 
-!Unit methodsFor: 'ej4' stamp: 'ab 11/29/2017 00:11'!
-healedBy: aUnit
-	aUnit heal: self.
-	state := EnabledState . ! !
-
-!Unit methodsFor: 'ej4' stamp: 'ab 11/29/2017 00:12'!
-interactWithAllElements
-	state ifAbleDo: [ (terrain elementsAround: self satisfying: [:x | self target value:x ]) do: [ :item | self action value:item ] ]! !
-
-!Unit methodsFor: 'ej4' stamp: 'ab 11/29/2017 00:12'!
+!Unit methodsFor: 'ej4' stamp: 'ab 11/30/2017 19:16'!
 isDisabled
-	^ state isDisabled ! !
+	^ isDisabled ! !
 
-
-!Unit methodsFor: 'initialization' stamp: 'ab 11/29/2017 00:12'!
-initializeIn: aTerrain with: aPoint and: aString 
-	team := aString .
-	state := EnabledState .
-	terrain := aTerrain .
-	location := aPoint .
-	aTerrain at: aPoint put: self.! !
-
-
-!Unit methodsFor: 'as yet unclassified' stamp: 'ab 11/7/2017 17:54'!
-location
-	^ location! !
-
-!Unit methodsFor: 'as yet unclassified' stamp: 'ab 11/28/2017 23:36'!
-getIfVisible
-	"A unit is always visible"
-	^ self! !
-
-!Unit methodsFor: 'as yet unclassified' stamp: 'ab 11/29/2017 00:11'!
-heal: aUnit
-	Exception new signal: 'Solo medicos pueden curar unidades'! !
-
-!Unit methodsFor: 'as yet unclassified' stamp: 'ab 11/7/2017 17:40'!
-team
-	^ team! !
-
-!Unit methodsFor: 'as yet unclassified' stamp: 'ab 11/7/2017 17:45'!
-selectSeenFrom: aCollection 
-	^ aCollection select: [:x | x isVisible ] .! !
+!Unit methodsFor: 'ej4' stamp: 'ab 11/30/2017 19:16'!
+interactWithAllElements
+	(terrain elementsAround: self satisfying: [:x | self target value:x ]) do: [ :item | self action value:item ]! !
 
 
 !Unit methodsFor: 'testing' stamp: 'ab 11/7/2017 17:47'!
@@ -1348,13 +1251,9 @@ Internal Representation and Key Implementation Points.
 target
 	^ [ :x | (x isKindOf: Unit) and: [ x isDisabled and: [ x team = team ] ] ]! !
 
-!Medic methodsFor: 'ej4' stamp: 'ab 11/29/2017 00:13'!
+!Medic methodsFor: 'ej4' stamp: 'ab 11/30/2017 19:17'!
 canHeal
-	^state isDisabled not ! !
-
-!Medic methodsFor: 'ej4' stamp: 'ab 11/29/2017 00:16'!
-heal: aUnit
-	state ifNotAbleDo: [ super heal: aUnit ]! !
+	^isDisabled not ! !
 
 !Medic methodsFor: 'ej4' stamp: 'Anonymous 11/3/2017 20:28'!
 action
