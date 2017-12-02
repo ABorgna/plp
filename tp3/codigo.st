@@ -1,98 +1,1 @@
-Object subclass: #Flag	instanceVariableNames: 'flagTeam'	classVariableNames: ''	poolDictionaries: ''	category: 'PLP'!
-	!Flag methodsFor: 'setting'	team: aTeam
-		flagTeam := aTeam.! !	!Flag methodsFor: 'accesing'	team
-		^flagTeam.! !	!Flag methodsFor: 'accesing'	getIfVisible
-		^ self! !	!Flag methodsFor: 'accesing'	isVisible
-		^true.! !Object subclass: #Game	instanceVariableNames: 'terrain flags teams currentTeamIndex'	classVariableNames: ''	poolDictionaries: ''	category: 'PLP'!	!Game methodsFor: 'as yet unclassified'	items: aClass at: positions
-		^ (1 to: positions size) asOrderedCollection collect: [ :i |
-			| obj |
-			terrain at: (positions at: i) put: (obj := aClass new) .
-			obj
-		]! !	!Game methodsFor: 'as yet unclassified'	registerTeam: aTeamName playerLocations: aPlayerCollection
-		| players |
-		players := aPlayerCollection pairsCollect: [ :pos :unitType  |
-			unitType new: terrain with: pos and: aTeamName ] .
-		teams add: (GameTeam new: aTeamName with: players) .! !	!Game methodsFor: 'as yet unclassified'	currentWinners
-		| teamFlags flagsPerTeam maxFlags |		(teamFlags := flags select: [ :f | f team isNotNil ]) ifEmpty: [ ^ { } ] .		maxFlags := ((flagsPerTeam  := teamFlags groupedBy: [ :f | f team ]) collect: [ :fs | fs size ]) max .		^ (teams collect: [ :t | t name ]) select: [ :tn | (flagsPerTeam at: tn ifAbsent: {}) size = maxFlags ]! !	!Game methodsFor: 'as yet unclassified'	moveCharacter: aMemberIndex to: aDirection steps: steps
-		(self currentTeam members at: aMemberIndex) move: steps to: aDirection .
-		self pass! !	!Game methodsFor: 'handling'	pass
-		currentTeamIndex := (currentTeamIndex % teams size) + 1! !	!Game methodsFor: 'initialization'	initializeWithX: anInteger Y: anInteger2 trapLocations: trapLocations flagLocations: flagLocations
-		terrain := (Terrain dimX: anInteger dimY: anInteger2) .
-		self items: Trap at: trapLocations .
-		flags := self items: Flag at: flagLocations .
-		teams := OrderedCollection new .
-		currentTeamIndex := 1 .! !	!Game methodsFor: 'accessing'	currentTeam
-		^ teams at: currentTeamIndex.! !"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!Game class	instanceVariableNames: ''!	!Game class methodsFor: 'instance creation'	newX: anInteger Y: anInteger2 trapLocations: trapLocations flagLocations: flagLocations
-		^ self new initializeWithX: anInteger Y: anInteger2 trapLocations: trapLocations flagLocations: flagLocations
-		! !Object subclass: #GameTeam	instanceVariableNames: 'name members'	classVariableNames: ''	poolDictionaries: ''	category: 'PLP'!	!GameTeam methodsFor: 'initialization'	initialize: aString with: aCollection
-		name := aString .
-		members := aCollection .
-		! !	!GameTeam methodsFor: 'as yet unclassified'	members
-		^ members! !	!GameTeam methodsFor: 'accessing'	name
-		^ name! !"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!GameTeam class	instanceVariableNames: ''!	!GameTeam class methodsFor: 'instance creation'	new: aString with: aCollection
-		^ self new initialize: aString with: aCollection ! !Object subclass: #Terrain	instanceVariableNames: 'matrix'	classVariableNames: ''	poolDictionaries: ''	category: 'PLP'!	!Terrain methodsFor: 'removing'	remove: anObject
-		matrix replaceAll: anObject  with: nil! !	!Terrain methodsFor: 'enumerating'	select: aBlockClosure
-		^ (matrix asBag select: [:x | x isNotNil ]) select: aBlockClosure ! !	!Terrain methodsFor: 'as yet unclassified'	dimX: anInteger dimY: anInteger2
-		matrix := Matrix rows: anInteger2 columns: anInteger.! !	!Terrain methodsFor: 'as yet unclassified'	elementsAround: aUnit satisfying: aBlockClosure
-		^ (self elementsAround: aUnit) select: aBlockClosure .! !	!Terrain methodsFor: 'accessing'	at: aPoint
-		^ matrix at: aPoint y at: aPoint x ! !	!Terrain methodsFor: 'accessing'	at: aPoint put: anObject
-		matrix at: aPoint y at: aPoint x put: anObject ! !	!Terrain methodsFor: 'accessing'	elementsAround: aUnit
-		| points |
-		points := (aUnit location eightNeighbors select: [:x | self contains: x]) select: [ :p | (self at: p) isNotNil ].
-		^ aUnit selectSeenFrom: (points collect: [ :p | self at: p ]) .! !	!Terrain methodsFor: 'accessing'	visibleAt: aPoint
-		^ (self at: aPoint) ifNotNil: [ :obj | ^ obj getIfVisible ]! !	!Terrain methodsFor: 'as yet unclassified '	contains: aPoint
-		^ (aPoint x > 0) & (aPoint x <= matrix columnCount) & (aPoint y > 0) & (aPoint y <= matrix rowCount) ! !"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!Terrain class	instanceVariableNames: ''!	!Terrain class methodsFor: 'as yet unclassified'	dimX: anInteger dimY: anInteger2
-		^(self new) dimX: anInteger dimY: anInteger2.
-	! !Object subclass: #Trap	instanceVariableNames: ''	classVariableNames: ''	poolDictionaries: ''	category: 'PLP'!	!Trap methodsFor: 'accesing'	getIfVisible
-		^ nil! !	!Trap methodsFor: 'accesing'	value
-		^nil.! !	!Trap methodsFor: 'accesing'	isVisible
-		^false.! !Object subclass: #Unit	instanceVariableNames: 'isDisabled terrain location team'	classVariableNames: ''	poolDictionaries: ''	category: 'PLP'!	!Unit methodsFor: 'testing'	isVisible
-		^ true.! !	!Unit methodsFor: 'as yet unclassified'	team
-		^ team! !	!Unit methodsFor: 'as yet unclassified'	getIfVisible
-		"A unit is always visible"
-		^ self! !	!Unit methodsFor: 'as yet unclassified'	selectSeenFrom: aCollection
-		^ aCollection select: [:x | x isVisible ] .! !	!Unit methodsFor: 'as yet unclassified'	location
-		^ location! !	!Unit methodsFor: 'ej4'	disable
-		isDisabled := true.! !	!Unit methodsFor: 'ej4'	move: anInteger to: aDirection
-		anInteger timesRepeat: [ self moveTo: aDirection ] ! !	!Unit methodsFor: 'ej4'	interactWithAllElements
-		(terrain elementsAround: self satisfying: [:x | self target value:x ]) do: [ :item | self action value:item ]! !	!Unit methodsFor: 'ej4'	healedBy: aUnit
-		aUnit canHeal ifFalse: [Exception new signal: 'Solo medicos sanos pueden curar unidades'].
-		isDisabled := false . ! !	!Unit methodsFor: 'ej4'	canMove
-		^isDisabled not.! !	!Unit methodsFor: 'ej4'	canMoveTo: aDirection
-		| nextLocation nextLocationIsValid |
-		nextLocation := aDirection nextFrom: location.
-		nextLocationIsValid := [ (terrain contains: nextLocation)
-				and: [
-					(terrain at: nextLocation) isNil
-					or: [ (terrain at: nextLocation) isVisible not ]
-				]
-			].
-		^ self canMove and: nextLocationIsValid! !	!Unit methodsFor: 'ej4'	canHeal
-		^ self subclassResponsibility! !	!Unit methodsFor: 'ej4'	action
-		^ self subclassResponsibility! !	!Unit methodsFor: 'ej4'	moveTo: aDirection
-		| content |
-		(self canMoveTo: aDirection) ifFalse: [ ^self].
-		terrain remove: self.
-		location := aDirection nextFrom: location.
-		content := terrain at: location.
-		terrain at: location put: self.
-		content ifNil: [self interactWithAllElements] ifNotNil: [ self disable ].
-		^self! !	!Unit methodsFor: 'ej4'	target
-		^ self subclassResponsibility ! !	!Unit methodsFor: 'ej4'	isDisabled
-		^ isDisabled ! !	!Unit methodsFor: 'initialization'	initializeIn: aTerrain with: aPoint and: aString
-		team := aString .
-		isDisabled := false .
-		terrain := aTerrain .
-		location := aPoint .
-		aTerrain at: aPoint put: self.! !"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!Unit class	instanceVariableNames: ''!	!Unit class methodsFor: 'instance creation'	new: aTerrain with: aPoint and: aString
-		^ self new initializeIn: aTerrain with: aPoint and: aString! !	Unit subclass: #Engineer	instanceVariableNames: ''	classVariableNames: ''	poolDictionaries: ''	category: 'PLP'!	!Engineer methodsFor: 'ej4'	target
-		^ [ :x | x isKindOf: Trap ]! !	!Engineer methodsFor: 'ej4'	action
-		^ [ :x | terrain remove:x ]! !	!Engineer methodsFor: 'ej4'	canHeal
-		^false! !	!Engineer methodsFor: 'ej4'	selectSeenFrom: aCollection
-		^ aCollection .! !Unit subclass: #Explorer	instanceVariableNames: ''	classVariableNames: ''	poolDictionaries: ''	category: 'PLP'!	!Explorer methodsFor: 'ej4'	target
-		^ [ :x | x isKindOf: Flag ]! !	!Explorer methodsFor: 'ej4'	canHeal
-		^false! !	!Explorer methodsFor: 'ej4'	action
-		^ [ :x | x team: team ]! !Unit subclass: #Medic	instanceVariableNames: ''	classVariableNames: ''	poolDictionaries: ''	category: 'PLP'!	!Medic methodsFor: 'ej4'	target
-		^ [ :x | (x isKindOf: Unit) and: [ x isDisabled and: [ x team = team ] ] ]! !	!Medic methodsFor: 'ej4'	canHeal
-		^isDisabled not ! !	!Medic methodsFor: 'ej4'	action
-		^ [ :x | x healedBy: self ]! !
+Object subclass: #Flag	instanceVariableNames: 'flagTeam'	classVariableNames: ''	poolDictionaries: ''	category: 'PLP'!	!Flag methodsFor: 'setting'	team: aTeam		flagTeam := aTeam.! !	!Flag methodsFor: 'accesing'	team		^flagTeam.! !	!Flag methodsFor: 'accesing'	isVisible		^true.! !Object subclass: #Game	instanceVariableNames: 'terrain flags teams currentTeamIndex'	classVariableNames: ''	poolDictionaries: ''	category: 'PLP'!	!Game methodsFor: 'as yet unclassified'	items: aClass at: positions		^ (1 to: positions size) asOrderedCollection collect: [ :i |			| obj |			terrain at: (positions at: i) put: (obj := aClass new) .			obj		]! !	!Game methodsFor: 'as yet unclassified'	registerTeam: aTeamName playerLocations: aPlayerCollection		| players |		players := aPlayerCollection pairsCollect: [ :pos :unitType  |			unitType new: terrain with: pos and: aTeamName ] .		teams add: (GameTeam new: aTeamName with: players) .! !	!Game methodsFor: 'as yet unclassified'	currentWinners		| teamFlags flagsPerTeam maxFlags |		(teamFlags := flags select: [ :f | f team isNotNil ]) ifEmpty: [ ^ { } ] .		maxFlags := ((flagsPerTeam  := teamFlags groupedBy: [ :f | f team ]) collect: [ :fs | fs size ]) max .		^ (teams collect: [ :t | t name ]) select: [ :tn | (flagsPerTeam at: tn ifAbsent: {}) size = maxFlags ]! !	!Game methodsFor: 'as yet unclassified'	moveCharacter: aMemberIndex to: aDirection steps: steps		(self currentTeam members at: aMemberIndex) move: steps to: aDirection .		self pass! !	!Game methodsFor: 'handling'	pass		currentTeamIndex := (currentTeamIndex % teams size) + 1! !	!Game methodsFor: 'initialization'	initializeWithX: anInteger Y: anInteger2 trapLocations: trapLocations flagLocations: flagLocations		terrain := (Terrain dimX: anInteger dimY: anInteger2) .		self items: Trap at: trapLocations .		flags := self items: Flag at: flagLocations .		teams := OrderedCollection new .		currentTeamIndex := 1 .! !	!Game methodsFor: 'accessing'	currentTeam		^ teams at: currentTeamIndex.! !"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!Game class	instanceVariableNames: ''!	!Game class methodsFor: 'instance creation'	newX: anInteger Y: anInteger2 trapLocations: trapLocations flagLocations: flagLocations		^ self new initializeWithX: anInteger Y: anInteger2 trapLocations: trapLocations flagLocations: flagLocations		! !Object subclass: #GameTeam	instanceVariableNames: 'name members'	classVariableNames: ''	poolDictionaries: ''	category: 'PLP'!	!GameTeam methodsFor: 'initialization'	initialize: aString with: aCollection		name := aString .		members := aCollection .		! !	!GameTeam methodsFor: 'as yet unclassified'	members		^ members! !	!GameTeam methodsFor: 'accessing'	name		^ name! !"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!GameTeam class	instanceVariableNames: ''!	!GameTeam class methodsFor: 'instance creation'	new: aString with: aCollection		^ self new initialize: aString with: aCollection ! !Object subclass: #Terrain	instanceVariableNames: 'matrix'	classVariableNames: ''	poolDictionaries: ''	category: 'PLP'!	!Terrain methodsFor: 'removing'	remove: anObject		matrix replaceAll: anObject  with: nil! !	!Terrain methodsFor: 'enumerating'	select: aBlockClosure		^ (matrix asBag select: [:x | x isNotNil ]) select: aBlockClosure ! !	!Terrain methodsFor: 'as yet unclassified'	dimX: anInteger dimY: anInteger2		matrix := Matrix rows: anInteger2 columns: anInteger.! !	!Terrain methodsFor: 'as yet unclassified'	elementsAround: aUnit satisfying: aBlockClosure		^ (self elementsAround: aUnit) select: aBlockClosure .! !	!Terrain methodsFor: 'accessing'	at: aPoint		^ matrix at: aPoint y at: aPoint x ! !	!Terrain methodsFor: 'accessing'	at: aPoint put: anObject		matrix at: aPoint y at: aPoint x put: anObject ! !	!Terrain methodsFor: 'accessing'	elementsAround: aUnit		| points |		points := aUnit location eightNeighbors select: [:x | (self contains: x) and: [(self at: x) isNotNil]   ].		^ aUnit selectSeenFrom: (points collect: [ :p | self at: p ]) .! !	!Terrain methodsFor: 'accessing'	visibleAt: aPoint		^ (self at: aPoint) ifNotNil: [ :obj | ^ obj value ]! !	!Terrain methodsFor: 'as yet unclassified '	contains: aPoint		^ (aPoint x > 0) & (aPoint x <= matrix columnCount) & (aPoint y > 0) & (aPoint y <= matrix rowCount) ! !"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!Terrain class	instanceVariableNames: ''!	!Terrain class methodsFor: 'as yet unclassified'	dimX: anInteger dimY: anInteger2		^(self new) dimX: anInteger dimY: anInteger2.	! !Object subclass: #Trap	instanceVariableNames: ''	classVariableNames: ''	poolDictionaries: ''	category: 'PLP'!	!Trap methodsFor: 'accesing'	value		^nil.! !	!Trap methodsFor: 'accesing'	isVisible		^false.! !Object subclass: #Unit	instanceVariableNames: 'isDisabled terrain location team'	classVariableNames: ''	poolDictionaries: ''	category: 'PLP'!	!Unit methodsFor: 'testing'	isVisible		^ true.! !	!Unit methodsFor: 'as yet unclassified'	team		^ team! !	!Unit methodsFor: 'as yet unclassified'	selectSeenFrom: aCollection		^ aCollection select: [:x | x isVisible ] .! !	!Unit methodsFor: 'as yet unclassified'	location		^ location! !	!Unit methodsFor: 'ej4'	disable		isDisabled := true.! !	!Unit methodsFor: 'ej4'	move: anInteger to: aDirection		anInteger timesRepeat: [ self moveTo: aDirection ] ! !	!Unit methodsFor: 'ej4'	interactWithAllElements		(terrain elementsAround: self satisfying: [:x | self target value:x ]) do: [ :item | self action value:item ]! !	!Unit methodsFor: 'ej4'	healedBy: aUnit		aUnit canHeal ifFalse: [Exception new signal: 'Solo medicos sanos pueden curar unidades'].		isDisabled := false . ! !	!Unit methodsFor: 'ej4'	canMove		^isDisabled not.! !	!Unit methodsFor: 'ej4'	canMoveTo: aDirection		| nextLocation nextLocationIsValid |		nextLocation := aDirection nextFrom: location.		nextLocationIsValid := [ (terrain contains: nextLocation)				and: [					(terrain at: nextLocation) isNil					or: [ (terrain at: nextLocation) isVisible not ]				]			].		^ self canMove and: nextLocationIsValid! !	!Unit methodsFor: 'ej4'	canHeal		^ self subclassResponsibility! !	!Unit methodsFor: 'ej4'	action		^ self subclassResponsibility! !	!Unit methodsFor: 'ej4'	moveTo: aDirection		| content |		(self canMoveTo: aDirection) ifFalse: [ ^self].		terrain remove: self.		location := aDirection nextFrom: location.		content := terrain at: location.		terrain at: location put: self.		content ifNil: [self interactWithAllElements] ifNotNil: [ self disable ].		^self! !	!Unit methodsFor: 'ej4'	target		^ self subclassResponsibility ! !	!Unit methodsFor: 'ej4'	isDisabled		^ isDisabled ! !	!Unit methodsFor: 'initialization'	initializeIn: aTerrain with: aPoint and: aString		team := aString .		isDisabled := false .		terrain := aTerrain .		location := aPoint .		aTerrain at: aPoint put: self.! !"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!Unit class	instanceVariableNames: ''!	!Unit class methodsFor: 'instance creation'	new: aTerrain with: aPoint and: aString		^ self new initializeIn: aTerrain with: aPoint and: aString! !Unit subclass: #Engineer	instanceVariableNames: ''	classVariableNames: ''	poolDictionaries: ''	category: 'PLP'!	!Engineer methodsFor: 'ej4'	target		^ [ :x | x isKindOf: Trap ]! !	!Engineer methodsFor: 'ej4'	action		^ [ :x | terrain remove:x ]! !	!Engineer methodsFor: 'ej4'	canHeal		^false! !	!Engineer methodsFor: 'ej4'	selectSeenFrom: aCollection		^ aCollection .! !Unit subclass: #Explorer	instanceVariableNames: ''	classVariableNames: ''	poolDictionaries: ''	category: 'PLP'!	!Explorer methodsFor: 'ej4'	target		^ [ :x | x isKindOf: Flag ]! !	!Explorer methodsFor: 'ej4'	canHeal		^false! !	!Explorer methodsFor: 'ej4'	action		^ [ :x | x team: team ]! !Unit subclass: #Medic	instanceVariableNames: ''	classVariableNames: ''	poolDictionaries: ''	category: 'PLP'!	!Medic methodsFor: 'ej4'	target		^ [ :x | (x isKindOf: Unit) and: [ x isDisabled and: [ x team = team ] ] ]! !	!Medic methodsFor: 'ej4'	canHeal		^isDisabled not ! !	!Medic methodsFor: 'ej4'	action		^ [ :x | x healedBy: self ]! !
