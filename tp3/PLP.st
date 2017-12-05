@@ -1,6 +1,7 @@
 ﻿Object subclass: #Direction	instanceVariableNames: ''	classVariableNames: ''	poolDictionaries: ''	category: 'PLP'!!Direction commentStamp: '<historical>' prior: 0!Direction!!Direction methodsFor: 'evaluating' stamp: 'PLP 10/9/2017 17:52'!nextFrom: puntoDeOrigen
 "Dado un punto, devuelve el resultado de moverse en la direccion correspondiente. "
-^self class nextFrom: puntoDeOrigen ! !"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!Direction class	instanceVariableNames: ''!!Direction class methodsFor: 'instance-creation' stamp: 'PLP 10/9/2017 17:53'!north
+^self class nextFrom: puntoDeOrigen ! !"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!Direction class	instanceVariableNames: ''!!Direction class methodsFor: 'evaluating' stamp: 'PLP 10/9/2017 17:54'!nextFrom: puntoDeOrigen
+	^ self subclassResponsibility ! !!Direction class methodsFor: 'instance-creation' stamp: 'PLP 10/9/2017 17:53'!north
 	^North new! !!Direction class methodsFor: 'instance-creation' stamp: 'PLP 10/9/2017 17:59'!northwest
 	^Northwest new! !!Direction class methodsFor: 'instance-creation' stamp: 'PLP 10/9/2017 17:52'!south
 	^South new! !!Direction class methodsFor: 'instance-creation' stamp: 'PLP 10/9/2017 17:53'!east
@@ -8,8 +9,7 @@
 	^Southeast new! !!Direction class methodsFor: 'instance-creation' stamp: 'PLP 10/9/2017 17:53'!west
 	^West new! !!Direction class methodsFor: 'instance-creation' stamp: 'PLP 10/9/2017 17:59'!southwest
 	^Southwest new! !!Direction class methodsFor: 'instance-creation' stamp: 'PLP 10/9/2017 17:59'!northeast
-	^Northeast new! !!Direction class methodsFor: 'evaluating' stamp: 'PLP 10/9/2017 17:54'!nextFrom: puntoDeOrigen
-	^ self subclassResponsibility ! !Direction subclass: #East	instanceVariableNames: ''	classVariableNames: ''	poolDictionaries: ''	category: 'PLP'!!East commentStamp: '<historical>' prior: 0!East!"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!East class	instanceVariableNames: ''!!East class methodsFor: 'evaluating' stamp: 'PLP 10/14/2017 23:32'!nextFrom: puntoDeOrigen
+	^Northeast new! !Direction subclass: #East	instanceVariableNames: ''	classVariableNames: ''	poolDictionaries: ''	category: 'PLP'!!East commentStamp: '<historical>' prior: 0!East!"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!East class	instanceVariableNames: ''!!East class methodsFor: 'evaluating' stamp: 'PLP 10/14/2017 23:32'!nextFrom: puntoDeOrigen
 
 	^(puntoDeOrigen x + 1)@(puntoDeOrigen y)! !Object subclass: #Flag	instanceVariableNames: 'flagTeam'	classVariableNames: ''	poolDictionaries: ''	category: 'PLP'!!Flag commentStamp: '<historical>' prior: 0!Please comment me using the following template inspired by Class Responsibility Collaborator (CRC) design:
 
@@ -31,9 +31,9 @@ Internal Representation and Key Implementation Points.
 
 
     Implementation Points!!Flag methodsFor: 'setting' stamp: 'Anonymous 10/29/2017 19:25'!team: aTeam 
-	flagTeam := aTeam.! !!Flag methodsFor: 'accesing' stamp: 'Anonymous 10/29/2017 18:53'!isVisible
-	^true.! !!Flag methodsFor: 'accesing' stamp: 'Anonymous 10/29/2017 19:28'!team
-	^flagTeam.! !Object subclass: #Game	instanceVariableNames: 'terrain flags teams currentTeamIndex'	classVariableNames: ''	poolDictionaries: ''	category: 'PLP'!!Game commentStamp: '<historical>' prior: 0!Please comment me using the following template inspired by Class Responsibility Collaborator (CRC) design:
+	flagTeam := aTeam.! !!Flag methodsFor: 'accesing' stamp: 'Anonymous 10/29/2017 19:28'!team
+	^flagTeam.! !!Flag methodsFor: 'accesing' stamp: 'Anonymous 10/29/2017 18:53'!isVisible
+	^true.! !Object subclass: #Game	instanceVariableNames: 'terrain flags teams currentTeamIndex'	classVariableNames: ''	poolDictionaries: ''	category: 'PLP'!!Game commentStamp: '<historical>' prior: 0!Please comment me using the following template inspired by Class Responsibility Collaborator (CRC) design:
 
 For the Class part:  State a one line summary. For example, "I represent a paragraph of text".
 
@@ -52,15 +52,16 @@ Public API and Key Messages
 Internal Representation and Key Implementation Points.
 
 
-    Implementation Points!!Game methodsFor: 'as yet unclassified' stamp: 'Anonymous 11/30/2017 23:50'!items: aClass at: positions
+    Implementation Points!!Game methodsFor: 'handling' stamp: 'ab 11/8/2017 14:56'!pass
+	currentTeamIndex := (currentTeamIndex % teams size) + 1! !!Game methodsFor: 'as yet unclassified' stamp: 'Anonymous 11/30/2017 23:53'!moveCharacter: aMemberIndex to: aDirection steps: steps
+	(self currentTeam members at: aMemberIndex) move: steps to: aDirection .
+	self pass! !!Game methodsFor: 'as yet unclassified' stamp: 'Anonymous 11/30/2017 23:50'!items: aClass at: positions
 	^ (1 to: positions size) asOrderedCollection collect: [ :i |
 		| obj |
 		terrain at: (positions at: i) put: (obj := aClass new) .
 		obj
 	]! !!Game methodsFor: 'as yet unclassified' stamp: 'Anonymous 12/1/2017 00:37'!currentWinners
-	| teamFlags flagsPerTeam maxFlags |		(teamFlags := flags select: [ :f | f team isNotNil ]) ifEmpty: [ ^ { } ] .	maxFlags := ((flagsPerTeam  := teamFlags groupedBy: [ :f | f team ]) collect: [ :fs | fs size ]) max .	^ (teams collect: [ :t | t name ]) select: [ :tn | (flagsPerTeam at: tn ifAbsent: {}) size = maxFlags ]! !!Game methodsFor: 'as yet unclassified' stamp: 'Anonymous 11/30/2017 23:53'!moveCharacter: aMemberIndex to: aDirection steps: steps
-	(self currentTeam members at: aMemberIndex) move: steps to: aDirection .
-	self pass! !!Game methodsFor: 'as yet unclassified' stamp: 'ab 11/8/2017 14:43'!registerTeam: aTeamName playerLocations: aPlayerCollection 
+	| teamFlags flagsPerTeam maxFlags |		(teamFlags := flags select: [ :f | f team isNotNil ]) ifEmpty: [ ^ { } ] .	maxFlags := ((flagsPerTeam  := teamFlags groupedBy: [ :f | f team ]) collect: [ :fs | fs size ]) max .	^ (teams collect: [ :t | t name ]) select: [ :tn | (flagsPerTeam at: tn ifAbsent: {}) size = maxFlags ]! !!Game methodsFor: 'as yet unclassified' stamp: 'ab 11/8/2017 14:43'!registerTeam: aTeamName playerLocations: aPlayerCollection 
 	| players |
 	players := aPlayerCollection pairsCollect: [ :pos :unitType  |
 		unitType new: terrain with: pos and: aTeamName ] .
@@ -70,8 +71,7 @@ Internal Representation and Key Implementation Points.
 	flags := self items: Flag at: flagLocations .
 	teams := OrderedCollection new .
 	currentTeamIndex := 1 .! !!Game methodsFor: 'accessing' stamp: 'ab 11/8/2017 14:48'!currentTeam
-	^ teams at: currentTeamIndex.! !!Game methodsFor: 'handling' stamp: 'ab 11/8/2017 14:56'!pass
-	currentTeamIndex := (currentTeamIndex % teams size) + 1! !"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!Game class	instanceVariableNames: ''!!Game class methodsFor: 'instance creation' stamp: 'gflan 11/23/2017 16:55'!newX: anInteger Y: anInteger2 trapLocations: trapLocations flagLocations: flagLocations
+	^ teams at: currentTeamIndex.! !"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!Game class	instanceVariableNames: ''!!Game class methodsFor: 'instance creation' stamp: 'gflan 11/23/2017 16:55'!newX: anInteger Y: anInteger2 trapLocations: trapLocations flagLocations: flagLocations
 	^ self new initializeWithX: anInteger Y: anInteger2 trapLocations: trapLocations flagLocations: flagLocations  
 	! !Object subclass: #GameTeam	instanceVariableNames: 'name members'	classVariableNames: ''	poolDictionaries: ''	category: 'PLP'!!GameTeam commentStamp: '<historical>' prior: 0!Please comment me using the following template inspired by Class Responsibility Collaborator (CRC) design:
 
@@ -131,16 +131,16 @@ Internal Representation and Key Implementation Points.
 
     Implementation Points!!Terrain methodsFor: 'as yet unclassified' stamp: 'ab 11/7/2017 17:17'!dimX: anInteger dimY: anInteger2 
 	matrix := Matrix rows: anInteger2 columns: anInteger.! !!Terrain methodsFor: 'as yet unclassified' stamp: 'ab 11/7/2017 18:02'!elementsAround: aUnit satisfying: aBlockClosure 
-	^ (self elementsAround: aUnit) select: aBlockClosure .! !!Terrain methodsFor: 'removing' stamp: 'gflan 11/23/2017 17:14'!remove: anObject 
-	matrix replaceAll: anObject  with: nil! !!Terrain methodsFor: 'as yet unclassified ' stamp: 'Anonymous 12/1/2017 00:10'!contains: aPoint 
-	^ (aPoint x > 0) & (aPoint x <= matrix columnCount) & (aPoint y > 0) & (aPoint y <= matrix rowCount) ! !!Terrain methodsFor: 'accessing' stamp: 'ab 11/7/2017 17:21'!at: aPoint
+	^ (self elementsAround: aUnit) select: aBlockClosure .! !!Terrain methodsFor: 'enumerating' stamp: 'ab 11/7/2017 17:30'!select: aBlockClosure 
+	^ (matrix asBag select: [:x | x isNotNil ]) select: aBlockClosure ! !!Terrain methodsFor: 'accessing' stamp: 'ab 11/7/2017 17:21'!at: aPoint
 	^ matrix at: aPoint y at: aPoint x ! !!Terrain methodsFor: 'accessing' stamp: 'ab 11/7/2017 17:20'!at: aPoint put: anObject
 	matrix at: aPoint y at: aPoint x put: anObject ! !!Terrain methodsFor: 'accessing' stamp: 'Anonymous 12/1/2017 20:30'!elementsAround: aUnit 
 	| points |
 	points := aUnit location eightNeighbors select: [:x | (self contains: x) and: [(self at: x) isNotNil]   ].
-	^ aUnit selectSeenFrom: (points collect: [ :p | self at: p ]) .! !!Terrain methodsFor: 'accessing' stamp: 'Anonymous 12/1/2017 20:24'!visibleAt: aPoint
-	^ (self at: aPoint) ifNotNil: [ :obj | ^ obj value ]! !!Terrain methodsFor: 'enumerating' stamp: 'ab 11/7/2017 17:30'!select: aBlockClosure 
-	^ (matrix asBag select: [:x | x isNotNil ]) select: aBlockClosure ! !"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!Terrain class	instanceVariableNames: ''!!Terrain class methodsFor: 'as yet unclassified' stamp: 'Anonymous 12/1/2017 00:12'!dimX: anInteger dimY: anInteger2 
+	^ aUnit selectSeenFrom: (points collect: [ :p | self at: p ]) .! !!Terrain methodsFor: 'accessing' stamp: 'Anonymous 12/5/2017 10:52'!visibleAt: aPoint
+	^ (self at: aPoint) value.! !!Terrain methodsFor: 'removing' stamp: 'gflan 11/23/2017 17:14'!remove: anObject 
+	matrix replaceAll: anObject  with: nil! !!Terrain methodsFor: 'as yet unclassified ' stamp: 'Anonymous 12/1/2017 00:10'!contains: aPoint 
+	^ (aPoint x > 0) & (aPoint x <= matrix columnCount) & (aPoint y > 0) & (aPoint y <= matrix rowCount) ! !"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!Terrain class	instanceVariableNames: ''!!Terrain class methodsFor: 'as yet unclassified' stamp: 'Anonymous 12/1/2017 00:12'!dimX: anInteger dimY: anInteger2 
 	^(self new) dimX: anInteger dimY: anInteger2.
 ! !TestCase subclass: #TestsEx1	instanceVariableNames: ''	classVariableNames: ''	poolDictionaries: ''	category: 'PLP'!!TestsEx1 methodsFor: 'testing' stamp: 'Anonymous 10/29/2017 19:17'!test1_2_visibilityAndValue
 	| flag trap |
@@ -558,25 +558,11 @@ Internal Representation and Key Implementation Points.
 
 
     Implementation Points!!Unit methodsFor: 'testing' stamp: 'ab 11/7/2017 17:47'!isVisible
-	^ true.! !!Unit methodsFor: 'as yet unclassified' stamp: 'ab 11/7/2017 17:54'!location
-	^ location! !!Unit methodsFor: 'as yet unclassified' stamp: 'ab 11/7/2017 17:45'!selectSeenFrom: aCollection 
-	^ aCollection select: [:x | x isVisible ] .! !!Unit methodsFor: 'as yet unclassified' stamp: 'ab 11/7/2017 17:40'!team
-	^ team! !!Unit methodsFor: 'ej4' stamp: 'ab 11/30/2017 19:15'!disable
-	isDisabled := true.! !!Unit methodsFor: 'ej4' stamp: 'Anonymous 12/1/2017 00:18'!healedBy: aUnit
-	aUnit canHeal ifFalse: [Exception new signal: 'Solo medicos sanos pueden curar unidades'].
-	isDisabled := false . ! !!Unit methodsFor: 'ej4' stamp: 'Anonymous 11/3/2017 20:32'!move: anInteger to: aDirection
-	anInteger timesRepeat: [ self moveTo: aDirection ] ! !!Unit methodsFor: 'ej4' stamp: 'ab 11/28/2017 23:22'!canMoveTo: aDirection 
-	| nextLocation nextLocationIsValid |
-	nextLocation := aDirection nextFrom: location. 
-	nextLocationIsValid := [ (terrain contains: nextLocation) 
-			and: [
-				(terrain at: nextLocation) isNil 
-				or: [ (terrain at: nextLocation) isVisible not ] 
-			] 
-		]. 
-	^ self canMove and: nextLocationIsValid! !!Unit methodsFor: 'ej4' stamp: 'Anonymous 11/3/2017 18:09'!canHeal
-	^ self subclassResponsibility! !!Unit methodsFor: 'ej4' stamp: 'ab 11/30/2017 19:15'!canMove
-	^isDisabled not.! !!Unit methodsFor: 'ej4' stamp: 'Anonymous 11/3/2017 19:57'!action
+	^ true.! !!Unit methodsFor: 'ej4' stamp: 'ab 11/30/2017 19:15'!disable
+	isDisabled := true.! !!Unit methodsFor: 'ej4' stamp: 'ab 11/30/2017 19:16'!interactWithAllElements
+	(terrain elementsAround: self satisfying: [:x | self target value:x ]) do: [ :item | self action value:item ]! !!Unit methodsFor: 'ej4' stamp: 'ab 11/30/2017 19:15'!canMove
+	^isDisabled not.! !!Unit methodsFor: 'ej4' stamp: 'Anonymous 11/3/2017 18:09'!canHeal
+	^ self subclassResponsibility! !!Unit methodsFor: 'ej4' stamp: 'Anonymous 11/3/2017 19:57'!action
 	^ self subclassResponsibility! !!Unit methodsFor: 'ej4' stamp: 'Anonymous 11/3/2017 17:58'!moveTo: aDirection
 	| content |
 	(self canMoveTo: aDirection) ifFalse: [ ^self].
@@ -586,9 +572,23 @@ Internal Representation and Key Implementation Points.
 	terrain at: location put: self.
 	content ifNil: [self interactWithAllElements] ifNotNil: [ self disable ].
 	^self! !!Unit methodsFor: 'ej4' stamp: 'Anonymous 11/3/2017 18:55'!target
-	^ self subclassResponsibility ! !!Unit methodsFor: 'ej4' stamp: 'ab 11/30/2017 19:16'!interactWithAllElements
-	(terrain elementsAround: self satisfying: [:x | self target value:x ]) do: [ :item | self action value:item ]! !!Unit methodsFor: 'ej4' stamp: 'ab 11/30/2017 19:16'!isDisabled
-	^ isDisabled ! !!Unit methodsFor: 'initialization' stamp: 'ab 11/30/2017 19:14'!initializeIn: aTerrain with: aPoint and: aString 
+	^ self subclassResponsibility ! !!Unit methodsFor: 'ej4' stamp: 'ab 11/28/2017 23:22'!canMoveTo: aDirection 
+	| nextLocation nextLocationIsValid |
+	nextLocation := aDirection nextFrom: location. 
+	nextLocationIsValid := [ (terrain contains: nextLocation) 
+			and: [
+				(terrain at: nextLocation) isNil 
+				or: [ (terrain at: nextLocation) isVisible not ] 
+			] 
+		]. 
+	^ self canMove and: nextLocationIsValid! !!Unit methodsFor: 'ej4' stamp: 'Anonymous 12/1/2017 00:18'!healedBy: aUnit
+	aUnit canHeal ifFalse: [Exception new signal: 'Solo medicos sanos pueden curar unidades'].
+	isDisabled := false . ! !!Unit methodsFor: 'ej4' stamp: 'Anonymous 11/3/2017 20:32'!move: anInteger to: aDirection
+	anInteger timesRepeat: [ self moveTo: aDirection ] ! !!Unit methodsFor: 'ej4' stamp: 'ab 11/30/2017 19:16'!isDisabled
+	^ isDisabled ! !!Unit methodsFor: 'as yet unclassified' stamp: 'ab 11/7/2017 17:40'!team
+	^ team! !!Unit methodsFor: 'as yet unclassified' stamp: 'ab 11/7/2017 17:45'!selectSeenFrom: aCollection 
+	^ aCollection select: [:x | x isVisible ] .! !!Unit methodsFor: 'as yet unclassified' stamp: 'ab 11/7/2017 17:54'!location
+	^ location! !!Unit methodsFor: 'initialization' stamp: 'ab 11/30/2017 19:14'!initializeIn: aTerrain with: aPoint and: aString 
 	team := aString .
 	isDisabled := false .
 	terrain := aTerrain .
@@ -614,10 +614,10 @@ Internal Representation and Key Implementation Points.
 
 
     Implementation Points!!Engineer methodsFor: 'ej4' stamp: 'Anonymous 11/3/2017 19:14'!target
-	^ [ :x | x isKindOf: Trap ]! !!Engineer methodsFor: 'ej4' stamp: 'ab 11/7/2017 17:49'!selectSeenFrom: aCollection 
+	^ [ :x | x isKindOf: Trap ]! !!Engineer methodsFor: 'ej4' stamp: 'Anonymous 11/3/2017 20:27'!action
+	^ [ :x | terrain remove:x ]! !!Engineer methodsFor: 'ej4' stamp: 'ab 11/7/2017 17:49'!selectSeenFrom: aCollection 
 	^ aCollection .! !!Engineer methodsFor: 'ej4' stamp: 'Anonymous 11/3/2017 17:48'!canHeal
-	^false! !!Engineer methodsFor: 'ej4' stamp: 'Anonymous 11/3/2017 20:27'!action
-	^ [ :x | terrain remove:x ]! !Unit subclass: #Explorer	instanceVariableNames: ''	classVariableNames: ''	poolDictionaries: ''	category: 'PLP'!!Explorer commentStamp: '<historical>' prior: 0!Please comment me using the following template inspired by Class Responsibility Collaborator (CRC) design:
+	^false! !Unit subclass: #Explorer	instanceVariableNames: ''	classVariableNames: ''	poolDictionaries: ''	category: 'PLP'!!Explorer commentStamp: '<historical>' prior: 0!Please comment me using the following template inspired by Class Responsibility Collaborator (CRC) design:
 
 For the Class part:  State a one line summary. For example, "I represent a paragraph of text".
 
